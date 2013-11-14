@@ -1,0 +1,48 @@
+#main { 
+	margin: auto;
+  	position: absolute;
+  	top: 0; 
+  	left: 0; 
+  	bottom: 0; 
+  	right: 0;
+	width: 80%; 
+	
+	background-color: transparent;  
+	outline: none; 
+	background-position: initial initial; 
+	background-repeat: initial initial;
+}
+#map {
+	top: 30px;
+	left: 0; 
+  	bottom: 0; 
+  	right: 0;
+  	position: absolute;
+	width: 99%;
+	height: 90%; 
+}
+
+#main #index-search-items 
+{
+	height: 28px;
+	width: 80%; 
+}
+
+#main #index-search-items input#index-search, #main #index-search-items input#index-submit 
+{
+	padding: 2px;
+	border: 1px solid;  
+  	position: relative;
+  	top: 0; 
+  	left: 0; 
+  	bottom: 0; 
+	height: auto; 
+}
+
+#main #index-search-items input#index-search {
+	width: 90%;
+}
+
+body {
+	background-color: #41B7D8;
+}

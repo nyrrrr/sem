@@ -1,7 +1,13 @@
 @(message: String)
 
-@main("Welcome to Play") {
+@import helper.twitterBootstrap._
 
-    @play20.welcome(message, style = "Java")
-
+@main("Welcome to SEM", message) {
+	<div id="main">
+		<div id="index-title">Semantic Event Map</div>
+		<div id="index-search-items">	
+			<input id="index-search" class="searchbar" name="search" type="text" placeholder="Enter or artist name here..." value=""/>
+			<button id="index-submit" class="submit">send</button>
+		</div>
+	</div>
 }
