@@ -46,3 +46,38 @@
 body {
 	background-color: #41B7D8;
 }
+
+/* MAPQUEST STUFF */
+
+/* information window stuff*/
+/*Override all CSS classes that reference the default InfoWindow PNG file and replace with your own custom InfoWindow.*/
+ .mqabasicwnd-corner div, .mqabasicwnd-close, .mqabasicwnd-close:hover,
+ .mqabasicwnd-pointer-bottom, .mqabasicwnd-pointer-top, .mqabasicwnd-pointer-left,
+ .mqabasicwnd-pointer-middleLeft, .mqabasicwnd-pointer-middleRight, .mqabasicwnd-pointer-topLeft,
+ .mqabasicwnd-pointer-topRight, .mqabasicwnd-pointer-bottomLeft, .mqabasicwnd-pointer-bottomRight,
+ .mqabasicwnd-btop div, .mqabasicwnd-bbottom div, .mqabasicwnd-bleft div, .mqabasicwnd-bright div {
+   background-image:url("http://developer.mapquest.com/content/documentation/common/images/sprite_info_window_blue.png") !important;
+ }
+ 
+ /*Set the width of the custom InfoWindow and the font for its contents.*/
+ .mqabasicwnd {
+   font:14px arial, helvetica, sans-serif;
+   width:300px !important;
+ }
+    
+ /*Use CSS to place the custom 'Close' button at its desired location. Also make sure to change the width and height of the 'Close' button if it's been changed from its default size.*/
+ .mqabasicwnd-close {
+   top:0px !important;
+   right:-18px !important;
+   width:18px !important;
+   height:20px !important;
+ }
+
+/* color */
+.panControl, .sliderWrapper, .slider, .zoomin, .zoomout, .maptoggle, .maptoggle span {
+	background-image:url("http://developer.mapquest.com/content/documentation/common/images/sprite_map_controls_blue.png") !important;
+}
+ 
+.min, .min:hover, .max, .max:hover {
+	background-image:url("http://developer.mapquest.com/content/documentation/common/images/min_max_blue.png") !important;
+}
