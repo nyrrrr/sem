@@ -1,9 +1,29 @@
-@(message: String)
+@(message: String, requestForm: Form[Request])
+
+@import helper._
 
 @main("Welcome to SEM", message) {
 	<div id="main">
-		<input id="index-search" class="searchbar" name="search" type="text" placeholder="Enter or artist name here..." value=""/>
-		<button id="mapbutton">send</button>
+		@form(action = routes.Application.processQuery(), 'id -> "requestForm") {
+			@inputText(requestForm("query"))
+			@for(error <- requestForm("query").errors) {
+				<p>@error.message</p>
+			}
+			@inputRadioGroup(requestForm("queryType")
+				, options = Seq("Event"->"Event","Location"->"Location")
+				, '_error -> requestForm("type").error.map(_.withMessage("select query type")))
+			@for(error <- requestForm("queryType").errors) {
+				<p>@error.message</p>
+			}
+			<input type="submit" value="Submit">
+				
+		}
 	</div>
-	<div id="map" style="width:800; height:500;"></div>
+	<!-- <script>$(function() {
+		$('#requestForm').submit(function(evt) {
+			evt.preventDefault();
+			$.post({});
+		});
+	});</script> -->
+	<!--<div id="map" style="width:800; height:500;"></div>-->
 }

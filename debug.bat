@@ -1,0 +1,2 @@
+play debug run
+pause

@@ -1,4 +1,4 @@
 /controllers
-
-*.class
+/models
 /views
+*.class
