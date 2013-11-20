@@ -19,11 +19,19 @@
 				
 		}
 	</div>
-	<!-- <script>$(function() {
+	<script>$(function() {
 		$('#requestForm').submit(function(evt) {
-			evt.preventDefault();
-			$.post({});
+			evt.preventDefault()
+			$.ajax({
+				url: "/request",
+				method: "post",
+				async: true,
+				dataType: "json",
+				data: {query: $("#query").val()+"", queryType: $("input[type=radio]:checked").val() },
+				success: function(a,b,c) {console.log("success", b)},
+				error: function(a,b) {console.log("fail"); console.table(a)}
+			});
 		});
-	});</script> -->
+	});</script>
 	<!--<div id="map" style="width:800; height:500;"></div>-->
 }

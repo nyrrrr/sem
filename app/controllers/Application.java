@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class Application extends Controller {
 
 	static Form<Request> requestForm = Form.form(Request.class);
+	static Form<Request> filledForm;
 
 	public static Result index() {
 		return ok(index.render("Semantic Event Map"));
@@ -21,17 +22,20 @@ public class Application extends Controller {
 
 	// default map rendering
 	public static Result displayMap() {
+		if (filledForm != null) {
+			Form<Request> tmp = filledForm;
+			filledForm = null;
+			return badRequest(map.render("Map", tmp));
+		}
 		return ok(map.render("Map", requestForm));
 	}
 
 	// handle input on map page
 	public static Result processQuery() {
 		Request req;
-		Form<Request> filledForm = requestForm.bindFromRequest();
+		filledForm = requestForm.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			if (filledForm.hasErrors()) {
-				return badRequest(views.html.map.render("Map", filledForm));
-			}
+			return controllers.Application.displayMap();
 		} else {
 			req = filledForm.get();
 		}
