@@ -3,35 +3,51 @@
 @import helper._
 
 @main("Welcome to SEM", message) {
-	<div id="main">
-		@form(action = routes.Application.processQuery(), 'id -> "requestForm") {
-			@inputText(requestForm("query"))
-			@for(error <- requestForm("query").errors) {
-				<p>@error.message</p>
-			}
-			@inputRadioGroup(requestForm("queryType")
-				, options = Seq("Event"->"Event","Location"->"Location")
-				, '_error -> requestForm("type").error.map(_.withMessage("select query type")))
-			@for(error <- requestForm("queryType").errors) {
-				<p>@error.message</p>
-			}
-			<input type="submit" value="Submit">
-				
-		}
-	</div>
-	<script>$(function() {
+<h3>@message</h3>
+<div id="main">
+	@form(action = routes.Application.processQuery(), 'id -> "requestForm") {
+	@inputText(requestForm("query"))
+	@for(error <- requestForm("query").errors) {
+	<p>
+		@error.message
+	</p>
+	}
+	@inputRadioGroup(requestForm("type")
+	, options = Seq("Event"->"Event","Location"->"Location")
+	, '_error -> requestForm("type").error.map(_.withMessage("select query type")))
+	@for(error <- requestForm("type").errors) {
+	<p>
+		@error.message
+	</p>
+	}
+	<input type="submit" value="Submit">
+
+	}
+</div>
+<script>
+	$(function() {
 		$('#requestForm').submit(function(evt) {
 			evt.preventDefault()
 			$.ajax({
-				url: "/request",
-				method: "post",
-				async: true,
-				dataType: "json",
-				data: {query: $("#query").val()+"", queryType: $("input[type=radio]:checked").val() },
-				success: function(a,b,c) {console.log("success", b)},
-				error: function(a,b) {console.log("fail"); console.table(a)}
+				url : "/request",
+				method : "post",
+				async : true,
+				dataType : "json",
+				data : {
+					query : $("#query").val() + "",
+					type : $("input[type=radio]:checked").val()
+				},
+				success : function(a, b, c) {
+					console.log("success");
+					console.table(a);
+				},
+				error : function(a, b) {
+					console.log("fail");
+					console.table(a)
+				}
 			});
 		});
-	});</script>
-	<!--<div id="map" style="width:800; height:500;"></div>-->
+	}); 
+</script>
+<div id="map" style="width:800; height:500px;"></div>
 }

@@ -9,10 +9,10 @@
 			@for(error <- requestForm("query").errors) {
 				<p>@error.message</p>
 			}
-			@inputRadioGroup(requestForm("queryType")
+			@inputRadioGroup(requestForm("type")
 				, options = Seq("Event"->"Event","Location"->"Location")
 				, '_error -> requestForm("type").error.map(_.withMessage("select query type")))
-			@for(error <- requestForm("queryType").errors) {
+			@for(error <- requestForm("type").errors) {
 				<p>@error.message</p>
 			}
 			<input type="submit" value="Submit">
@@ -27,7 +27,7 @@
 				method: "post",
 				async: true,
 				dataType: "json",
-				data: {query: $("#query").val()+"", queryType: $("input[type=radio]:checked").val() },
+				data: {query: $("#query").val()+"", type: $("input[type=radio]:checked").val() },
 				success: function(a,b,c) {console.log("success", b)},
 				error: function(a,b) {console.log("fail"); console.table(a)}
 			});

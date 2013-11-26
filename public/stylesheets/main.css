@@ -1,6 +1,6 @@
 #main { 
 	margin: auto;
-  	position: absolute;
+  	position: relative;
   	top: 0; 
   	left: 0; 
   	bottom: 0; 
@@ -13,13 +13,13 @@
 	background-repeat: initial initial;
 }
 #map {
-	top: 30px;
+	top: 0px;
 	left: 0; 
   	bottom: 0; 
   	right: 0;
-  	position: absolute;
+  	position: relative;
 	width: 99%;
-	height: 90%; 
+	height: 100%; 
 }
 
 #main #index-search-items 
@@ -45,6 +45,10 @@
 
 body {
 	background-color: #41B7D8;
+}
+
+dt label {
+	display : none;
 }
 
 /* MAPQUEST STUFF */
