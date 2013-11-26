@@ -110,7 +110,7 @@ public class LastfmUri {
 	 */
 	public String getGeoEvents(String location, int distance, boolean festivalsOnly) throws UnsupportedEncodingException{
 		StringBuilder uri = new StringBuilder(100);
-		uri.append("/2.0/?api_key=");
+		uri.append("2.0/?api_key=");
 		uri.append(API_KEY);
 		
 		if(location != null){
