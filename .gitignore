@@ -16,3 +16,4 @@ dist
 app/*.class
 app/controllers/*.class
 app/models/*.class
+/bin
