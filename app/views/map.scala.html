@@ -4,7 +4,7 @@
 
 @main("Welcome to SEM", message) {
 <h3>@message</h3>
-<div id="main">
+<div id="overlay">
 	@form(action = routes.Application.processQuery(), 'id -> "requestForm") {
 	@inputText(requestForm("query"))
 	@for(error <- requestForm("query").errors) {
@@ -24,7 +24,8 @@
 
 	}
 </div>
-<script>
+<script type="application/javascript">
+	/// handle input of form
 	$(function() {
 		$('#requestForm').submit(function(evt) {
 			evt.preventDefault()
@@ -49,5 +50,5 @@
 		});
 	}); 
 </script>
-<div id="map" style="width:800; height:500px;"></div>
+<div id="map" style="width:800; height:500px;" />
 }

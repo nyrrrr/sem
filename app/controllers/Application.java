@@ -1,9 +1,5 @@
 package controllers;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-
 import models.Request;
 import play.data.Form;
 import play.libs.Json;
@@ -12,11 +8,7 @@ import play.mvc.Result;
 import views.html.index;
 import views.html.map;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Application extends Controller {
 
