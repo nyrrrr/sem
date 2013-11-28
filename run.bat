@@ -1,2 +1,2 @@
-play ~run
+play debug ~run
 pause

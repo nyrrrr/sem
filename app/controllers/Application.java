@@ -16,7 +16,7 @@ public class Application extends Controller {
 	static Form<Request> filledForm;
 
 	public static Result index() {
-		return ok(index.render("Semantic Event Map"));
+		return controllers.Application.displayMap();
 	}
 
 	// default map rendering

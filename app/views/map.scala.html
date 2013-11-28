@@ -3,52 +3,25 @@
 @import helper._
 
 @main("Welcome to SEM", message) {
-<h3>@message</h3>
-<div id="overlay">
-	@form(action = routes.Application.processQuery(), 'id -> "requestForm") {
-	@inputText(requestForm("query"))
-	@for(error <- requestForm("query").errors) {
-	<p>
-		@error.message
-	</p>
-	}
-	@inputRadioGroup(requestForm("type")
-	, options = Seq("Event"->"Event","Location"->"Location")
-	, '_error -> requestForm("type").error.map(_.withMessage("select query type")))
-	@for(error <- requestForm("type").errors) {
-	<p>
-		@error.message
-	</p>
-	}
-	<input type="submit" value="Submit">
+<div id="container">
+	<div id='dpanel' style='display:none;'></div>
+	<div id="overlay" class="shadow center ui-corner-all">
+		<input id="query" type="text" name="query" class="text ui-widget-content ui-corner-all" value="" placeholder="Enter name of artist or location or venue here..." title="e.g. Volbeat, Lady Gaga, Mannheim, Germany" />
+		</input>
+		<div id="type" class="ui-widget">
+			<input type="radio" id="artist" name="type" value="artist">
+			<label for="artist" title="With this option all the events performed by a certain artists will be displayed">Artist</label>
+			<input type="radio" id="radius" name="type" value="radius">
+			<label for="radius" title="In radius mode this will show you all the events next to location you enter">Radius</label>
+			<input type="radio" id="venue" name="type" value="venue">
+			<label for="venue" title="This will return all the events taking place in the entered venue.">Venue</label>
+		</div >
 
-	}
+		<button id="submit" class="ui-state-default ui-corner-all ui-state-hover" title="Start search!">
+			<span class=" ui-icon ui-icon-play" title="Start search!"> OK </span>
+		</button>
+
+	</div>
+	<div id='map' style='width:800; height:500px;'></div>
 </div>
-<script type="application/javascript">
-	/// handle input of form
-	$(function() {
-		$('#requestForm').submit(function(evt) {
-			evt.preventDefault()
-			$.ajax({
-				url : "/request",
-				method : "post",
-				async : true,
-				dataType : "json",
-				data : {
-					query : $("#query").val() + "",
-					type : $("input[type=radio]:checked").val()
-				},
-				success : function(a, b, c) {
-					console.log("success");
-					console.table(a);
-				},
-				error : function(a, b) {
-					console.log("fail");
-					console.table(a)
-				}
-			});
-		});
-	}); 
-</script>
-<div id="map" style="width:800; height:500px;" />
 }

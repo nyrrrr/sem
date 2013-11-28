@@ -1,2 +1,0 @@
-play debug run
-pause

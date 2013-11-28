@@ -3,71 +3,98 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
-        @if(message == "Map") {
-			<script src="@routes.Assets.at("javascripts/map/map.js")" type="text/javascript"></script>
-			<script src="http://open.mapquestapi.com/sdk/js/v7.0.s/mqa.toolkit.js?key=Fmjtd%7Cluubn9uan9%2Cal%3Do5-902296"></script>
-			<script type="text/javascript">
- 
-			   /*An example of using the MQA.EventUtil to hook into the window load event and execute defined function
-			   passed in as the last parameter. You could alternatively create a plain function here and have it
-			   executed whenever you like (e.g. <body onload="yourfunction">).*/
-			 var map;
+	<head>
+		<title>@title</title>
+		<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+		<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/smoothness/jquery-ui-1.10.3.custom.css")">
+		<link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+		<script src="@routes.Assets.at("javascripts/jquery-1.9.1.js")" type="text/javascript"></script>
+		<script src="@routes.Assets.at("javascripts/jquery-ui-1.10.3.custom.min.js")" type="text/javascript"></script>
+		@if(message == "Map") {
+		<script src="@routes.Assets.at("javascripts/map/map.js")" type="text/javascript"></script>
+		<script src="http://open.mapquestapi.com/sdk/js/v7.0.s/mqa.toolkit.js?key=Fmjtd%7Cluubn9uan9%2Cal%3Do5-902296"></script>
+		<script type="text/javascript">
+			/*An example of using the MQA.EventUtil to hook into the window load event and execute defined function
+			 passed in as the last parameter. You could alternatively create a plain function here and have it
+			 executed whenever you like (e.g. <body onload="yourfunction">).*/
+			var map;
+			if (window.MQA !== undefined) {
 				MQA.EventUtil.observe(window, 'load', function() {
-				
+
 					// Create an object for options
-					var options={
-						elt: document.getElementById('map'),           	/*ID of element on the page where you want the map added*/
-						zoom: 13,               
-					// initial zoom level of the map
-						latLng: { lat: 49.48703, lng: 8.46625 },	   	/*center of map in latitude/longitude */
-						mtype: 'osm',                                	/*map type (osm)*/
-						bestFitMargin: 0,                              	/*margin offset from the map viewport when applying a bestfit on shapes*/
-						zoomOnDoubleClick: true                        	/*zoom in when double-clicking on map*/
+					var options = {
+						elt : document.getElementById('map'), /*ID of element on the page where you want the map added*/
+						zoom : 13,
+						// initial zoom level of the map
+						latLng : {
+							lat : 49.48703,
+							lng : 8.46625
+						}, /*center of map in latitude/longitude */
+						mtype : 'osm', /*map type (osm)*/
+						bestFitMargin : 0, /*margin offset from the map viewport when applying a bestfit on shapes*/
+						zoomOnDoubleClick : true	/*zoom in when double-clicking on map*/
 					};
-				 
+
 					// Construct an instance of MQA.TileMap with the options object
 					map = new MQA.TileMap(options);
-					 
+
 					// add controls
-					MQA.withModule('largezoom','viewoptions','geolocationcontrol','insetmapcontrol','mousewheel', function() {
-					
-						map.addControl(
-							new MQA.LargeZoom(),
-							new MQA.MapCornerPlacement(MQA.MapCorner.TOP_LEFT, new MQA.Size(5,5))
-						);
-					 
+					MQA.withModule('largezoom', 'viewoptions', 'geolocationcontrol', 'insetmapcontrol', 'mousewheel', function() {
+
+						map.addControl(new MQA.LargeZoom(), new MQA.MapCornerPlacement(MQA.MapCorner.TOP_LEFT, new MQA.Size(5, 5)));
+
 						map.addControl(new MQA.ViewOptions());
-					 
-						map.addControl(
-							new MQA.GeolocationControl(),
-							new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10,50))
-						);
-					 
+
+						map.addControl(new MQA.GeolocationControl(), new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
+
 						// Map Control options
-						var options={
-							size: { width: 150, height: 125 },
-							zoom: 3,
-							mapType: 'osmsat',
-							minimized: false
+						var options = {
+							size : {
+								width : 150,
+								height : 125
+							},
+							zoom : 3,
+							mapType : 'osmsat',
+							minimized : false
 						};
-					 
-						map.addControl(
-							new MQA.InsetMapControl(options),
-							new MQA.MapCornerPlacement(MQA.MapCorner.BOTTOM_RIGHT)
-						);
-					 
+
+						map.addControl(new MQA.InsetMapControl(options), new MQA.MapCornerPlacement(MQA.MapCorner.BOTTOM_RIGHT));
+
 						map.enableMouseWheelZoom();
-					});				 
+					});
 				});
-			</script>
-        }
-    </head>
-    <body>
-        @content
-    </body>
+				$(function() {
+					$("#dpanel").html("<h1>SEM</h1><h3>Semantic Event Map</h3>");
+					$("#dpanel").css({
+						"display" : "block",
+						"position" : "relative",
+						"top": "20px",
+						"width" : "38%",
+						"left" : "30%",
+						"font-size": "30px",
+						"padding" : "1%",
+						"text-align" : "center"
+					});
+				});
+			} else {
+				MQA = new Object();
+				// show error
+				$(function() {
+					$("#dpanel").html("<b>#ERROR: Map could not be loaded.</b><br />Your internet connection might not be working correctly.");
+					$("#dpanel").css({
+						"position" : "relative",
+						"top": "20px",
+						"width" : "30%",
+						"left" : "30%",
+						"font-size": "25px",
+						"padding" : "5%"
+					}).show("fade", "slow").addClass("error", 1000);
+				});
+			}
+		</script>
+		}
+	</head>
+	<body>
+		@content
+	</body>
 </html>

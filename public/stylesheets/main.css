@@ -1,96 +1,107 @@
-#main { 
-	margin: auto;
-  	position: relative;
-  	top: 0; 
-  	left: 0; 
-  	bottom: 0; 
-  	right: 0;
-	width: 80%; 
-	
-	background-color: transparent;  
-	outline: none; 
-	background-position: initial initial; 
-	background-repeat: initial initial;
+body {
+	background-color: #FFF;
+	overflow: hidden;
+	font: 70% "Trebuchet MS", sans-serif;
 }
-#overlay {
-    /*position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #000;
-    filter:alpha(opacity=50);
-    -moz-opacity:0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-    z-index: 10000;*/
+div {
+	margin: 0px;
+	padding: 0px;
+}
+h1, h3 {
+	margin : 0px;
+	padding : 0px;
+	top: 0px;
+}
+#main {
+	width: 100%;
+	height: 100%;
+}
+div#overlay.center input, div#overlay.center div, div#overlay.center button {
+	margin: 0.5%;
+}
+div#overlay.header {
+	width: 100%;
+	position: relative;
+}
+#offline-error-msg {
+
+}
+div#overlay.center input#query {
+	margin-left: 4%;
+	margin-top: 5%;
+	width: 90%;
+	height: 23px;
+	padding: 0.5%;
+}
+div#overlay.center div#type {
+	margin-left: 4%;
+	width: 100%;
+	height: 23px;
+}
+#submit, #type {
+	display: none;
+}
+div#overlay.center button#submit {
+	float: right;
+	margin-right: 4.8%;
+	/*width: 23px;
+	 height: 23px;*/
+}
+#submit span {
+
 }
 #map {
-
-	margin : 0px;
+	display: none;
+}
+.shadow {
+	-moz-box-shadow: 3px 3px 5px 6px #ccc;
+	-webkit-box-shadow: 3px 3px 5px 6px #ccc;
+	box-shadow: 3px 3px 5px 6px #ccc;
 }
 
-#main #index-search-items 
-{
-	height: 28px;
-	width: 80%; 
+.center {
+	position: relative;
+	margin-left: 25%;
+	margin-top: 3%;
+	/*transform: translate(-50%, -50%);
+	 -webkit-transform: translate(-50%,-50%);
+	 -ms-transform: translate(-50%,-50%);
+	 -moz-transform: translate(-50%,-50%);
+	 -o-transform: translate(-50%,-50%);*/
+	width: 50%;
+	height: 150px;
 }
-
-#main #index-search-items input#index-search, #main #index-search-items input#index-submit 
-{
-	padding: 2px;
-	border: 1px solid;  
-  	position: relative;
-  	top: 0; 
-  	left: 0; 
-  	bottom: 0; 
-	height: auto; 
+.error {
+	background: #cd0a0a url(images/ui-bg_glass_95_fef1ec_1x400.png) 50% 50% repeat-x;
+	color: #ffffff;
 }
-
-#main #index-search-items input#index-search {
-	width: 90%;
-}
-
-body {
-	background-color: #41B7D8;
-	overflow: hidden;
-}
-
-dt label {
-	display : none;
-}
-
 /* MAPQUEST STUFF */
 
 /* information window stuff*/
 /*Override all CSS classes that reference the default InfoWindow PNG file and replace with your own custom InfoWindow.*/
- .mqabasicwnd-corner div, .mqabasicwnd-close, .mqabasicwnd-close:hover,
- .mqabasicwnd-pointer-bottom, .mqabasicwnd-pointer-top, .mqabasicwnd-pointer-left,
- .mqabasicwnd-pointer-middleLeft, .mqabasicwnd-pointer-middleRight, .mqabasicwnd-pointer-topLeft,
- .mqabasicwnd-pointer-topRight, .mqabasicwnd-pointer-bottomLeft, .mqabasicwnd-pointer-bottomRight,
- .mqabasicwnd-btop div, .mqabasicwnd-bbottom div, .mqabasicwnd-bleft div, .mqabasicwnd-bright div {
-   background-image:url("http://developer.mapquest.com/content/documentation/common/images/sprite_info_window_blue.png") !important;
- }
- 
- /*Set the width of the custom InfoWindow and the font for its contents.*/
- .mqabasicwnd {
-   font:14px arial, helvetica, sans-serif;
-   width:300px !important;
- }
-    
- /*Use CSS to place the custom 'Close' button at its desired location. Also make sure to change the width and height of the 'Close' button if it's been changed from its default size.*/
- .mqabasicwnd-close {
-   top:0px !important;
-   right:-18px !important;
-   width:18px !important;
-   height:20px !important;
- }
+.mqabasicwnd-corner div, .mqabasicwnd-close, .mqabasicwnd-close:hover, .mqabasicwnd-pointer-bottom, .mqabasicwnd-pointer-top, .mqabasicwnd-pointer-left, .mqabasicwnd-pointer-middleLeft, .mqabasicwnd-pointer-middleRight, .mqabasicwnd-pointer-topLeft, .mqabasicwnd-pointer-topRight, .mqabasicwnd-pointer-bottomLeft, .mqabasicwnd-pointer-bottomRight, .mqabasicwnd-btop div, .mqabasicwnd-bbottom div, .mqabasicwnd-bleft div, .mqabasicwnd-bright div {
+	background-image: url("http://developer.mapquest.com/content/documentation/common/images/sprite_info_window_blue.png") !important;
+}
+
+/*Set the width of the custom InfoWindow and the font for its contents.*/
+.mqabasicwnd {
+	font: 14px arial, helvetica, sans-serif;
+	width: 300px !important;
+}
+
+/*Use CSS to place the custom 'Close' button at its desired location. Also make sure to change the width and height of the 'Close' button if it's been changed from its default size.*/
+.mqabasicwnd-close {
+	top: 0px !important;
+	right: -18px !important;
+	width: 18px !important;
+	height: 20px !important;
+}
 
 /* color */
 .panControl, .sliderWrapper, .slider, .zoomin, .zoomout, .maptoggle, .maptoggle span {
-	background-image:url("http://developer.mapquest.com/content/documentation/common/images/sprite_map_controls_blue.png") !important;
+	background-image: url("http://developer.mapquest.com/content/documentation/common/images/sprite_map_controls_blue.png") !important;
 }
- 
+
 .min, .min:hover, .max, .max:hover {
-	background-image:url("http://developer.mapquest.com/content/documentation/common/images/min_max_blue.png") !important;
+	background-image: url("http://developer.mapquest.com/content/documentation/common/images/min_max_blue.png") !important;
 }
