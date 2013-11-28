@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 public class MusicbrainzSparqlFactory {
 
-	public static final String ENDPOINT = "http://dbtune.org/musicbrainz/sparql";
+	public final String ENDPOINT = "http://dbtune.org/musicbrainz/sparql";
 	
 	private static MusicbrainzSparqlFactory instance = null;
 	private final String PREFIXES;

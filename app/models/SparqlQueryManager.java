@@ -1,7 +1,6 @@
 package models;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.hp.hpl.jena.query.ARQ;
 import com.hp.hpl.jena.query.Query;
@@ -27,18 +26,18 @@ public class SparqlQueryManager {
 		return instance;
 	}
 	
-	public HashMap<RDFNode, RDFNode> sendQuery(String endpoint, String queryString){
+	public ArrayList<RDFNode> sendQuery(String endpoint, String queryString){
 
 		Query query = QueryFactory.create(queryString);
 		ARQ.getContext().setTrue(ARQ.useSAX);
 		QueryExecution execution = QueryExecutionFactory.sparqlService(endpoint, query);
-		HashMap<RDFNode, RDFNode> rdfNodes = new HashMap<RDFNode, RDFNode>();
+		ArrayList<RDFNode> rdfNodes = new ArrayList<RDFNode>();
 		
 		try{
 			ResultSet results = execution.execSelect();
 			while(results.hasNext()){
 				QuerySolution solution = results.nextSolution();
-				rdfNodes.put(solution.get("?p"), solution.get("?o"));
+				rdfNodes.add(solution.get("?s"));
 				System.out.println(solution.get("?s") + "   " + solution.get("?p") + "   " + solution.get("?o"));
 			}
 		}

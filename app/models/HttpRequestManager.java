@@ -4,12 +4,8 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
-
-import play.libs.Json;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import java.net.HttpURLConnection;
 
 public class HttpRequestManager {
 
@@ -29,7 +25,7 @@ public class HttpRequestManager {
 		return instance;
 	}
 	
-	public JsonNode sendRequest(String requestMethod, String endpoint, String params) throws IOException{
+	public void sendRequest(String requestMethod, String endpoint, String params) throws IOException{
 		
 		URL url = new URL(endpoint + params);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -53,12 +49,10 @@ public class HttpRequestManager {
 		StringBuilder stringResponse = new StringBuilder();
 		String line = "";
 		while((line = rd.readLine()) != null){
-//			System.out.println(line);
+			System.out.println(line);
 			stringResponse.append(line);
 		}
 		rd.close();
-		
-		return Json.parse(stringResponse.toString());
 		
 	}
 	
