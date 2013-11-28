@@ -1,6 +1,7 @@
+/ApplicationTest.class
+/IntegrationTest$1.class
+/IntegrationTest.class
+/TestHttpRequestManager.class
 /controllers
 /models
 /views
-
-*.html
-*.class

@@ -10,7 +10,7 @@ import java.net.URLEncoder;
  */
 public class LastfmUri {
 
-	public final String ENDPOINT = "http://ws.audioscrobbler.com/";
+	public static final String ENDPOINT = "http://ws.audioscrobbler.com/";
 	public final String API_KEY = "d4f2b544b1f11f5bd7fbc3ca3c33db26";
 	public final String API_SECRET = "5b536824fec9b868fde4d42f5564fc7e";
 	
@@ -32,7 +32,7 @@ public class LastfmUri {
 	 * Private Constructor, necessary for the singleton pattern.
 	 */
 	private LastfmUri(){
-		this.isJSON = false;
+		this.isJSON = true;
 	}
 	
 	/**
