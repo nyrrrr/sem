@@ -33,7 +33,7 @@ div#overlay {
 }
 div#overlay.header {
 	vertical-align: middle;
-	position: relative;
+	position: fixed;
 	left: 0%;
 	z-index: 9999;
 	height: 52px;
@@ -59,7 +59,6 @@ div#overlay.header input#query, div#overlay.header button#submit {
 div#overlay.header input#query {
 	padding: 0.25%;
 }
-
 div#overlay input#query {
 	margin-left: 1px;
 	margin-top: 1%;
@@ -92,6 +91,9 @@ div#overlay button#submit {
 }
 #map {
 	display: none;
+}
+#map div {
+	overflow: visible;
 }
 .shadow {
 	-moz-box-shadow: 3px 3px 5px 6px #ccc;

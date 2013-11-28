@@ -1,4 +1,4 @@
-// center
+// center function
 jQuery.fn.center = function() {
 	this.css("position", "absolute");
 	this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + $(window).scrollTop()) + "px");
@@ -18,7 +18,7 @@ $(function() {
 });
 // some basic css adjustments and simple input event handling
 function generalStylingAndSetup() {
-	// tooltips
+	// tooltips init
 	var tooltips = $(document).tooltip({
 		position : {
 			my : "left bottom-5",
@@ -32,14 +32,17 @@ function generalStylingAndSetup() {
 	}
 	// input field focus
 	$('#query').on({
+		// when user types show next input elements
 		input : function() {
-			$('.ui-tooltip-13').hide("fade", "fast");
+			//$('.ui-tooltip-13').hide("fade", "fast");
 			$('#type').show("fade", "slow");
 		}
 	});
 	// submit button
 	$('#submit').button().click(function(event) {
+		// do not submit form or anything
 		event.preventDefault();
+		// handle user input only when a radio button has been selected and we are online!
 		if ($("input[type=radio]:checked").size() > 0 && (MQA.fake === undefined)) {
 			handleUserInput();
 		} else {
@@ -51,36 +54,49 @@ function generalStylingAndSetup() {
 		$('#submit').show("fade", "slow");
 	});
 }
-
 // resize map to screen width
 function resizeMapOnStart() {
 	$('#map').css({
 		width : window.innerWidth + "px",
-		height : (window.innerHeight + "px")// - overlayHeight) + "px",
+		height : (window.innerHeight + "px"),
 	});
 }
-
-// on page resize resize map as well
+// resize map on window resize
 function resizeMapOnWindowResize() {
 	var wdw = $(window);
 	wdw.resize(function() {
-		window.map.setSize(new MQA.Size(window.innerWidth + "px", (window.innerHeight - $('#overlay.header').height())+"px"));
+		window.map.setSize(new MQA.Size(window.innerWidth + "px", (window.innerHeight - 52) + "px"));
+		$('#map').css('top', "52px");
 	});
 }
-
-function reorderVisuals() {
-	//
-	$('#overlay').prepend($("#dpanel h1")).show("fade", "slow").removeClass("center", 1000).addClass("header", 1000).dequeue();
+// guess what...
+function reorderDomElements() {
+	// adjust overlay
+	$('#overlay').prepend($("#dpanel h1")).show("fade", "fast").removeClass("center", "slow").addClass("header", "slow").dequeue();
+	// remove panel
 	$("#dpanel").remove();
-	$('body').data("moved", "true"); 
-	// make map visible and move
-	$('#map').show("fade", "slow");
-	$(window).trigger('resize');
+	// save state
+	$('body').data("moved", "true");
+	// make map visible
+	//$('#map').css('top', $('.header').height() + "px");;
+	//$('#map div').css('overflow', 'visible');
+	// trigger map resize
+	var int = setInterval(function() {
+		if (!($('#map').is(":animated"))) {
+			clearInterval(int);
+			$(window).trigger("resize");
+			$('#map').effect( "slide", "slow" );
+			console.log($('.header').height());
+		}
+	}, 100);
 }
-
+// guess again...
 function handleUserInput() {
+	// TODO input validation
 	if (true) {
-		if ($('body').data("moved") === undefined) reorderVisuals();
+		// only reorder if it has not already be done
+		if ($('body').data("moved") === undefined)
+			reorderDomElements();
 		$(function() {
 			$('#submit').click(function(evt) {
 				evt.preventDefault()
@@ -90,14 +106,17 @@ function handleUserInput() {
 					async : true,
 					dataType : "json",
 					data : {
+						// we really need some input validation here...
 						query : $("#query").val() + "",
 						type : $("input[type=radio]:checked").val()
 					},
 					success : function(a, b, c) {
-						console.log("success");
+						// debug
+						console.log("success"); 
 						console.table(a);
 					},
 					error : function(a, b) {
+						// debug
 						console.log("fail");
 						console.table(a)
 					}
@@ -107,9 +126,7 @@ function handleUserInput() {
 	} else {
 		// TODO error handling?
 	}
-
 }
-
 /*
 // listener
 $(document).on('click', '#mapbutton', handleInput);
