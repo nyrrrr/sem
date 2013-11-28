@@ -16,6 +16,8 @@ public class SparqlQueryManager {
 
 	private static SparqlQueryManager instance = null;
 	
+	
+	
 	private SparqlQueryManager(){
 
 	}

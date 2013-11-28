@@ -79,13 +79,45 @@ public class Application extends Controller {
 	 * @return an Artist instance containing all events and artist information.
 	 * @throws IOException
 	 */
-	public Artist getArtistEvents(String artist, boolean festivalsOnly) throws IOException{		
-		// Create parameter for Lastfm query. Send request to Lastfm and store response in JsonNode.
-		String params = LastfmUri.getInstance().getArtistEvents(artist, festivalsOnly);
-		JsonNode jsonLastfm = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
+	public JsonNode getArtistEvents(String artist, boolean festivalsOnly) throws IOException{		
+		
+		// create parameter for Last.fm query to retrieve artist info (especially for mbid)
+		String params = LastfmUri.getInstance().getArtistInfo(artist);
+		JsonNode jsonArtistInfo = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
+		jsonArtistInfo = jsonArtistInfo.get("artist");
+		String mbid = jsonArtistInfo.get("mbid").toString().replaceAll("\"", "");
+		String name = jsonArtistInfo.get("name").toString().replaceAll("\"", "");
+		
+		// create artist with name and mbid (if existing)
+		Artist a;
+		if(mbid != null){
+			a = new Artist(mbid, name);
+		} else {
+			a = new Artist(name);
+		}
+		
+		// get whether the artist is on tour or not
+		if(jsonArtistInfo.get("ontour").toString().replaceAll("\"", "").equals("1")){
+			a.setOnTour(true);
+		}
+		
+		// get image link
+		for(JsonNode image : jsonArtistInfo.get("image")){
+			if(image.get("size").toString().replaceAll("\"", "").equals("large"));
+			a.setImg(image.get("#text").toString().replaceAll("\"", ""));
+		}
+		
+		
+		// Create parameter for Last.fm query to retrieve all events. Send request to Last.fm and store response in JsonNode.
+		if(a.getMbid() != null){
+			params = LastfmUri.getInstance().getArtistEventsViaMbid(a.getMbid(), festivalsOnly);
+		} else {
+			params = LastfmUri.getInstance().getArtistEvents(artist, festivalsOnly);
+		}
+		JsonNode jsonArtistEvents = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
 		
 		// Extract all information from result JsonNode and store them in respective objects.
-		JsonNode events = jsonLastfm.get("events").get("event");
+		JsonNode events = jsonArtistEvents.get("events").get("event");
 		HashMap<String, Event> eventList = new HashMap<String, Event>();
 		for(JsonNode jEvent : events){
 			Event event = new Event(jEvent.get("id").toString().replaceAll("\"", ""), jEvent.get("title").toString().replaceAll("\"", ""));
@@ -115,20 +147,26 @@ public class Application extends Controller {
 			eventList.put(event.getId(), event);
 		}
 		
-		String query = musicbrainz.getArtistInfo(artist);
-		HashMap<RDFNode, RDFNode> nodes = sparql.sendQuery(musicbrainz.ENDPOINT, query);
+		// Store the all events in artist's object.
+		a.setEvents(eventList);
+		
+		// query Musicbrainz via SPARQL in order to get further artist info.
+		String query;
+		if(a.getMbid() != null){
+			query = musicbrainz.getArtistInfoViaMbid(a.getMbid());
+		} else {
+			query = musicbrainz.getArtistInfo(artist);
+		}
+		
+		// extract info from SPARQL response
+		HashMap<RDFNode, RDFNode> nodes = sparql.sendQuery(MusicbrainzSparqlFactory.ENDPOINT, query);
 		for(RDFNode key : nodes.keySet()){
 			System.out.println("Key: " + key.toString());
 			System.out.println("Value: " + nodes.get(key).toString());
 			System.out.println("");
-		}
+		}		
 		
-		
-		// Create Artist object and store the corresponding event list in it.
-		Artist a = new Artist(artist);
-		a.setEvents(eventList);
-		
-		return a;
+		return Json.toJson(a);
 	}
 	
 	public String getVenueEvents(String venue, String country){

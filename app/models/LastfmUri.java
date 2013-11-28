@@ -17,8 +17,10 @@ public class LastfmUri {
 	public final String ARTIST = "artist";
 	public final String EVENT = "event";
 	public final String LOCATION = "location";
+	public final String MBID = "mbid";
 	public final String VENUE = "venue";
 	public final String METHOD_ARTIST_GETEVENTS = "artist.getEvents";
+	public final String METHOD_ARTIST_GETINFO = "artist.getInfo";
 	public final String METHOD_EVENT_GETINFO = "event.getInfo";
 	public final String METHOD_GEO_GETEVENTS = "geo.getEvents";
 	public final String METHOD_VENUE_SEARCH = "venue.search";
@@ -50,11 +52,32 @@ public class LastfmUri {
 	 * Returns the whole parameter string that is necessary to request all events of a particular artist via the Last.fm API.
 	 * @param artist - Name of an interpret or a band, e.g. 'Volbeat'.
 	 * @param festivalsOnly - <code>true</code> if only festivals shall be shown, <code>false</code> if all events shall be retrieved.
-	 * @return parameter string for requesting the Last.fm API
+	 * @return parameter string for requesting the Last.fm API.
 	 * @throws UnsupportedEncodingException
 	 */
 	public String getArtistEvents(String artist, boolean festivalsOnly) throws UnsupportedEncodingException{
 		return lastfmURI(ARTIST, METHOD_ARTIST_GETEVENTS, artist, festivalsOnly);
+	}
+	
+	/**
+	 * Returns the whole parameter string that is necessary to request all events of a particular artist via the Last.fm API.
+	 * @param mbid - A unique id for an interpret or band, e.g. "bfcc6d75-a6a5-4bc6-8282-47aec8531818" for Cher.
+	 * @param festivalsOnly - <code>true</code> if only festivals shall be shown, <code>false</code> if all events shall be retrieved.
+	 * @return parameter string for requesting the Last.fm API.
+	 * @throws UnsupportedEncodingException
+	 */
+	public String getArtistEventsViaMbid(String mbid, boolean festivalsOnly) throws UnsupportedEncodingException{
+		return lastfmURI(MBID, METHOD_ARTIST_GETEVENTS, mbid, festivalsOnly);
+	}
+	
+	/**
+	 * Returns the whole parameter string that is necessary to request all events of a particular artist via the Last.fm API.
+	 * @param artist - Name of an interpret or a band, e.g. "Volbeat".
+	 * @return parameter string for requesting the Last.fm API.
+	 * @throws UnsupportedEncodingException
+	 */
+	public String getArtistInfo(String artist) throws UnsupportedEncodingException{
+		return lastfmURI(ARTIST, METHOD_ARTIST_GETINFO, artist, false);
 	}
 	
 	/**

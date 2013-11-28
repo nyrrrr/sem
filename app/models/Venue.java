@@ -200,6 +200,7 @@ public class Venue {
 		
 		String json = builder.toString();
 		json = json.replaceAll(", ]", "]");
+		json = json.replaceAll(", }", "}");
 		return json;
 	}
 	

@@ -127,6 +127,7 @@ public class Event {
 		
 		String json = builder.toString();
 		json = json.replaceAll(", ]", "]");
+		json = json.replaceAll(", }", "}");
 		return json;
 	}
 	

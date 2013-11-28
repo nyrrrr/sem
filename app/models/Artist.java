@@ -18,6 +18,7 @@ public class Artist {
 	private String country;
 	private String homepage;
 	private String wiki;
+	private boolean isOnTour;
 	private ArrayList<String> genres;
 	private ArrayList<String> members;
 	private HashMap<String, Event> events;
@@ -38,20 +39,21 @@ public class Artist {
 	}
 	
 	public Artist(String name, String img, String country, String homepage,
-			String wiki, ArrayList<String> genres, ArrayList<String> members,
+			String wiki, boolean isOnTour, ArrayList<String> genres, ArrayList<String> members,
 			HashMap<String, Event> events){
 		this.name = name;
 		this.img = img;
 		this.country = country;
 		this.homepage = homepage;
 		this.wiki = wiki;
+		this.isOnTour = isOnTour;
 		this.genres = genres;
 		this.members = members;
 		this.events = events;
 	}
 	
 	public Artist(String mbid, String name, String img, String country, String homepage,
-			String wiki, ArrayList<String> genres, ArrayList<String> members,
+			String wiki, boolean isOnTour, ArrayList<String> genres, ArrayList<String> members,
 			HashMap<String, Event> events){
 		this.mbid = mbid;
 		this.name = name;
@@ -59,6 +61,7 @@ public class Artist {
 		this.country = country;
 		this.homepage = homepage;
 		this.wiki = wiki;
+		this.isOnTour = isOnTour;
 		this.genres = genres;
 		this.members = members;
 		this.events = events;
@@ -128,6 +131,14 @@ public class Artist {
 		this.wiki = wiki;
 	}
 	
+	public boolean isOnTour() {
+		return isOnTour;
+	}
+
+	public void setOnTour(boolean isOnTour) {
+		this.isOnTour = isOnTour;
+	}
+
 	public HashMap<String, Event> getEvents() {
 		return events;
 	}
@@ -194,6 +205,7 @@ public class Artist {
 			.append("\"country\": ")		.append(this.country != null? "\"" + this.country + "\"" : null)		.append(", ")
 			.append("\"homepage\": ")		.append(this.homepage != null? "\"" + this.homepage + "\"" : null)		.append(", ")
 			.append("\"wiki\": ")			.append(this.wiki != null? "\"" + this.wiki + "\"" : null)				.append(", ")
+			.append("\"onTour\": ")			.append(this.isOnTour)													.append(", ")
 			.append("\"genres\": [");
 		for(String genre : genres){
 			builder.append("\"" + genre + "\", ");
@@ -203,7 +215,7 @@ public class Artist {
 		for(String member : members){
 			builder.append("\"" + member + "\", ");	
 		}
-		builder.append("]");
+		builder.append("], ");
 		
 		if(includeEvents){
 			builder.append("\"events\": [");
@@ -217,6 +229,7 @@ public class Artist {
 		
 		String json = builder.toString();
 		json = json.replaceAll(", ]", "]");
+		json = json.replaceAll(", }", "}");
 	
 		return json;
 		

@@ -61,8 +61,16 @@ public class MusicbrainzSparqlFactory {
 		return PREFIXES + 
 				"SELECT * WHERE {" + 
 			    " ?s foaf:name \"" + artist + "\"." +
-				" ?s ?p ?o." +
+				" ?s foaf:member ?o." +
 			    "}";
+	}
+	
+	public String getArtistInfoViaMbid(String mbid){
+		return PREFIXES +
+				"SELECT * WHERE {" + 
+				" ?s mo:musicbrainz <http://musicbrainz.org/artist/" + mbid + ">." + 
+				" ?s ?p ?o." + 
+				"}";
 	}
 	
 	public String getResource(String resourceUri){
