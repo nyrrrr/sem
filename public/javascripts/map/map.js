@@ -1,40 +1,46 @@
+// center
 jQuery.fn.center = function() {
 	this.css("position", "absolute");
 	this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + $(window).scrollTop()) + "px");
 	this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + $(window).scrollLeft()) + "px");
 	return this;
 }
+// on page ready
 $(function() {
 	// style
 	generalStylingAndSetup();
-	// resize map to screen width
-	resizeMapOnStart();
-	// on page resize resize map as well
-	resizeMapOnWindowResize
+	if (MQA.fake === undefined) {
+		// resize map to screen width
+		resizeMapOnStart();
+		// on page resize resize map as well
+		resizeMapOnWindowResize();
+	}
 });
-
+// some basic css adjustments and simple input event handling
 function generalStylingAndSetup() {
 	// tooltips
-	var tooltips = $(document).tooltip({position: { my: "left bottom-5", at: "left top", collision: "flipfit" }});
+	var tooltips = $(document).tooltip({
+		position : {
+			my : "left bottom-5",
+			at : "left top",
+			collision : "flipfit"
+		}
+	});
 	// center overlay
 	if (!('WebkitTransform' in document.body.style || 'MozTransform' in document.body.style || 'OTransform' in document.body.style || 'transform' in document.body.style)) {
 		$('.center').center();
 	}
-	console.log(1);
 	// input field focus
-	$('#query').on(
-		{
-			input : function() {
-				$('.ui-tooltip-13').hide("fade", "fast");
-				$('#type').show("fade", "slow");
-			}
+	$('#query').on({
+		input : function() {
+			$('.ui-tooltip-13').hide("fade", "fast");
+			$('#type').show("fade", "slow");
 		}
-		
-	);
+	});
 	// submit button
 	$('#submit').button().click(function(event) {
 		event.preventDefault();
-		if ($("input[type=radio]:checked").size() > 1) {
+		if ($("input[type=radio]:checked").size() > 0 && (MQA.fake === undefined)) {
 			handleUserInput();
 		} else {
 			// TODO error handling
@@ -58,14 +64,23 @@ function resizeMapOnStart() {
 function resizeMapOnWindowResize() {
 	var wdw = $(window);
 	wdw.resize(function() {
-		window.map.setSize(new MQA.Size(window.innerWidth + "px", (window.innerHeight)));
+		window.map.setSize(new MQA.Size(window.innerWidth + "px", (window.innerHeight - $('#overlay.header').height())+"px"));
 	});
+}
+
+function reorderVisuals() {
+	//
+	$('#overlay').prepend($("#dpanel h1")).show("fade", "slow").removeClass("center", 1000).addClass("header", 1000).dequeue();
+	$("#dpanel").remove();
+	$('body').data("moved", "true"); 
+	// make map visible and move
+	$('#map').show("fade", "slow");
+	$(window).trigger('resize');
 }
 
 function handleUserInput() {
 	if (true) {
-		$('#map').show("fade", "slow");
-
+		if ($('body').data("moved") === undefined) reorderVisuals();
 		$(function() {
 			$('#submit').click(function(evt) {
 				evt.preventDefault()

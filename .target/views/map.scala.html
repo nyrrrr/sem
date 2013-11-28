@@ -4,7 +4,7 @@
 
 @main("Welcome to SEM", message) {
 <div id="container">
-	<div id='dpanel' style='display:none;'></div>
+	<div id='dpanel'></div>
 	<div id="overlay" class="shadow center ui-corner-all">
 		<input id="query" type="text" name="query" class="text ui-widget-content ui-corner-all" value="" placeholder="Enter name of artist or location or venue here..." title="e.g. Volbeat, Lady Gaga, Mannheim, Germany" />
 		</input>
@@ -17,8 +17,8 @@
 			<label for="venue" title="This will return all the events taking place in the entered venue.">Venue</label>
 		</div >
 
-		<button id="submit" class="ui-state-default ui-corner-all ui-state-hover">
-			<span class=" ui-icon ui-icon-play" title="Send Query"> OK </span>
+		<button id="submit" class="ui-state-default ui-corner-all ui-state-hover" title="Start search!">
+			<span class=" ui-icon ui-icon-play" title="Start search!"> OK </span>
 		</button>
 
 	</div>
