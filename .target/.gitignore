@@ -2,5 +2,7 @@
 /models
 /views
 
+/*.html
+/*.class
 *.html
 *.class
