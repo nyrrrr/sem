@@ -118,29 +118,41 @@ public class LastfmUri {
 	 * @return parameter string for requesting the Last.fm API
 	 * @throws UnsupportedEncodingException
 	 */
-	public String getVenueEvents(int id, boolean festivalsOnly) throws UnsupportedEncodingException{
-		return lastfmURI(VENUE, METHOD_VENUE_GETEVENTS, Integer.toString(id), festivalsOnly);
+	public String getVenueEvents(String id, boolean festivalsOnly) throws UnsupportedEncodingException{
+		return lastfmURI(VENUE, METHOD_VENUE_GETEVENTS, id, festivalsOnly);
 	}
 	
 	/**
 	 * Returns the whole parameter string that is necessary for requesting all events in the area of a particular location.
 	 * If no location is handed over, the current position will be taken.
-	 * @param location - The desired location, e.g. 'Mannheim'.
+	 * @param longitude - The longitude of a geo location.
+	 * @param latitude - The longitude of a geo location.
 	 * @param distance - The radius to search within in kilometers, e.g. '10'.
 	 * @param festivalsOnly - <code>true</code> if only festivals shall be retrieved, <code>false</code> if all event types shall be retrieved.
 	 * @return parameter string for requesting the Last.fm API
 	 * @throws UnsupportedEncodingException
 	 */
-	public String getGeoEvents(String location, int distance, boolean festivalsOnly) throws UnsupportedEncodingException{
+	public String getGeoEvents(String longitude, String latitude, int distance, boolean festivalsOnly) throws UnsupportedEncodingException{
+	
 		StringBuilder uri = new StringBuilder(100);
-		uri.append("2.0/?api_key=");
+		
+		//build uri
+		uri.append("2.0/?method=");
+		uri.append(METHOD_GEO_GETEVENTS);
+		uri.append("&");
+		uri.append("&api_key=");
 		uri.append(API_KEY);
 		
-		if(location != null){
-			location = URLEncoder.encode(location, "UTF-8");
-			uri.append("&location=");
-			uri.append(location);
+		if(longitude != null && latitude != null){		
+			longitude = URLEncoder.encode(longitude, "UTF-8");
+			uri.append("&long=");
+			uri.append(longitude);
+			
+			latitude = URLEncoder.encode(latitude, "UTF-8");
+			uri.append("&lat=");
+			uri.append(latitude);	
 		}
+		
 		if(distance > 0){
 			uri.append("&distance=");
 			uri.append(distance);
@@ -148,8 +160,12 @@ public class LastfmUri {
 		if(festivalsOnly){
 			uri.append("&festivalsonly=1");
 		}
-		
+		if(isJSON){
+			uri.append("&format=json");
+		}
+
 		return uri.toString();
+		
 	}
 	
 	/**

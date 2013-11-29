@@ -1,6 +1,8 @@
 package controllers;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import models.Artist;
@@ -67,8 +69,53 @@ public class Application extends Controller {
 		return ok(result);
 	}
 	
-	public String getLocalEvents(String longitude, String latitude, int radius){
-		return null;
+	/**
+	 * Send geo.getEvents request to Last.fm. Parse response responses and store the information in the respective objects - Artist, Event, Venue.
+	 * @param longitude - The longitude of a geo location.
+	 * @param latitude - The latitude of a geo location.
+	 * @param radius - A maximum radius to search for events with provided geo location (longitude and latitude) as center.
+	 * @param festivalsOnly - <code>true</code> if only festivals shall be retrieved, <code>false</code> if all events shall be displayed.
+	 * @return eventNodes - A list of all events stored as JsonNode objects.
+	 * @throws IOException
+	 */
+	public ArrayList<JsonNode> getLocalEvents(String longitude, String latitude, int radius, boolean festivalsOnly) throws IOException{
+		ArrayList<JsonNode> eventNodes = new ArrayList<JsonNode>();
+		
+		// create parameter for Last.fm query to retrieve local event info
+		String params = LastfmUri.getInstance().getGeoEvents(longitude, latitude, radius, festivalsOnly);
+		JsonNode jsonGeoEvents = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
+		jsonGeoEvents = jsonGeoEvents.get("events");
+		
+		// iterate through each event, create object and set variables
+		for(JsonNode event : jsonGeoEvents.get("event")){
+			Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
+			for(JsonNode artist : event.get("artists")){
+				Artist a = new Artist(artist.toString().replaceAll("\"", ""));
+				e.addArtist(a);
+			}
+			JsonNode jsonVenue = event.get("venue");
+			Venue v = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
+			v.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
+			v.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+			v.setCity(jsonVenue.get("location").get("city").toString().replaceAll("\"", ""));
+			v.setCountry(jsonVenue.get("location").get("country").toString().replaceAll("\"", ""));
+			v.setStreet(jsonVenue.get("location").get("street").toString().replaceAll("\"", ""));
+			v.setPostalCode(jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
+			v.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
+			v.setPhone(jsonVenue.get("phonenumber").toString().replaceAll("\"", ""));
+			for(JsonNode image : event.get("image")){
+				if(image.get("size").toString().replaceAll("\"", "").equals("large")){
+					v.setImg(image.get("#text").toString().replaceAll("\"", ""));
+				}
+			}
+			e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
+			
+			// convert event to JsonNode and store it in eventNodes list.
+			eventNodes.add(Json.toJson(e));
+			
+		}
+				
+		return eventNodes;
 	}
 	
 	/**
@@ -169,8 +216,25 @@ public class Application extends Controller {
 		return Json.toJson(a);
 	}
 	
-	public String getVenueEvents(String venue, String country){
+	public JsonNode getVenueEvents(String id, boolean festivalsOnly) throws IOException{
+		String params = LastfmUri.getInstance().getVenueEvents(id, festivalsOnly);
+		JsonNode jsonVenueEvents = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
+		jsonVenueEvents = jsonVenueEvents.get("events");
+		
+		for(JsonNode event : jsonVenueEvents){
+			
+		}
+		
+		
 		return null;
+	}
+	
+	public static void main(String[] args) throws IOException{
+		Application app = new Application();
+		ArrayList<JsonNode> eventList = app.getLocalEvents(null, null, 10, false);
+		JsonNode node = Json.toJson(eventList);
+		System.out.println(node.toString());
+		
 	}
 	
 }

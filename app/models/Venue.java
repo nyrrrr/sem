@@ -1,15 +1,6 @@
 package models;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Venue {
 
@@ -26,47 +17,26 @@ public class Venue {
 	private String phone;	
 	private HashMap<String, Event> events;
 	
+	/**
+	 * Constructor - Creates a Venue object and sets the variables.
+	 * @param id - A unique venue id.
+	 * @param name - The venue's name.
+	 */
 	public Venue(String id, String name){
 		this.id = id;
 		this.name = name;
 		events = new HashMap<String, Event>();
 	}
 	
+	/**
+	 * Constructor - Creates a Venue object and sets the variables.
+	 * @param id - A unique venue id.
+	 * @param name - The venue's name.
+	 * @param events - All events that take place at this venue.
+	 */
 	public Venue(String id, String name, HashMap<String, Event> events){
 		this.id = id;
 		this.name = name;
-		this.events = events;
-	}
-	
-	public Venue(String id, String name, String img, String city, String street, 
-			String postalCode, String country, String longitude, String latitude,
-			String homepage, String phone){
-		this.id = id;
-		this.name = name;
-		this.img = img;
-		this.city = city;
-		this.street = street;
-		this.postalCode = postalCode;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.homepage = homepage;
-		this.phone = phone;
-		events = new HashMap<String, Event>();
-	}
-	
-	public Venue(String id, String name, String img, String city, String street, 
-			String postalCode, String country, String longitude, String latitude,
-			String homepage, String phone, HashMap<String, Event> events){
-		this.id = id;
-		this.name = name;
-		this.img = img;
-		this.city = city;
-		this.street = street;
-		this.postalCode = postalCode;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.homepage = homepage;
-		this.phone = phone;
 		this.events = events;
 	}
 	
@@ -202,47 +172,6 @@ public class Venue {
 		json = json.replaceAll(", ]", "]");
 		json = json.replaceAll(", }", "}");
 		return json;
-	}
-	
-	public void toJSON(File file){
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-		map.put("id", this.id);
-		map.put("name", this.name);
-		map.put("img", this.img);
-		map.put("city", this.city);
-		map.put("street", this.street);
-		map.put("postalCode", this.postalCode);
-		map.put("country", this.country);
-		map.put("latitude", this.latitude);
-		map.put("longitude", this.longitude);
-		map.put("homepage", this.homepage);
-		map.put("phone", this.phone);
-		map.put("events", this.events);
-	
-		System.out.println(map.toString());
-		
-//		ObjectMapper mapper = new ObjectMapper();
-//		try{
-//			mapper.writeValue(file, map);
-//		} catch(JsonGenerationException e){
-//			e.printStackTrace();
-//		} catch(JsonMappingException e){
-//			e.printStackTrace();
-//		} catch(IOException e){
-//			e.printStackTrace();
-//		}
-	}
-	
-	public static void main(String[] args){
-		Artist artist1 = new Artist("Volbeat");
-		Artist artist2 = new Artist("Enter Shikari");
-		ArrayList<Artist> artists = new ArrayList<Artist>(Arrays.asList(artist1, artist2));
-		Event e1 = new Event("654321", "Event Arena", artists);
-		Venue venue = new Venue("123456", "TestVenue", "http://www.venuepics.de/venue.png", "Gotham City", "Bat Cave 1", "00001", "Utopia", "47.00000", "8.00000", "www.test.com", "123-456-789");
-		venue.addEvent(e1);
-		System.out.println(venue.toJSON());
-		
 	}
 	
 } // End of Class

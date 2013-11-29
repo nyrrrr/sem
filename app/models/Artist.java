@@ -1,14 +1,7 @@
 package models;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Artist {
 
@@ -23,6 +16,10 @@ public class Artist {
 	private ArrayList<String> members;
 	private HashMap<String, Event> events;
 	
+	/**
+	 * Constructor - Creates an Artist object and sets the variables.
+	 * @param name - The artist's name.
+	 */
 	public Artist(String name){
 		this.name = name;
 		this.genres = new ArrayList<String>();
@@ -30,6 +27,11 @@ public class Artist {
 		this.events = new HashMap<String, Event>();
 	}
 	
+	/**
+	 * Constructor - Creates an Artist object and sets the variables.
+	 * @param mbid - A unique Musicbrainz identifier for the artist.
+	 * @param name - The artist's name.
+	 */
 	public Artist(String mbid, String name){
 		this.mbid = mbid;
 		this.name = name;
@@ -38,32 +40,25 @@ public class Artist {
 		this.events = new HashMap<String, Event>();
 	}
 	
-	public Artist(String name, String img, String country, String homepage,
-			String wiki, boolean isOnTour, ArrayList<String> genres, ArrayList<String> members,
-			HashMap<String, Event> events){
+	/**
+	 * Constructor - Creates an Artist object and sets the variables.
+	 * @param name - The artist's name.
+	 * @param events - All events of the artist.
+	 */
+	public Artist(String name, HashMap<String, Event> events){
 		this.name = name;
-		this.img = img;
-		this.country = country;
-		this.homepage = homepage;
-		this.wiki = wiki;
-		this.isOnTour = isOnTour;
-		this.genres = genres;
-		this.members = members;
 		this.events = events;
 	}
 	
-	public Artist(String mbid, String name, String img, String country, String homepage,
-			String wiki, boolean isOnTour, ArrayList<String> genres, ArrayList<String> members,
-			HashMap<String, Event> events){
+	/**
+	 * Constructor - Creates an Artist object and sets the variables.
+	 * @param mbid - A unique Musicbrainz identifier for the artist.
+	 * @param name - The artist's name.
+	 * @param events - All events of the artist.
+	 */
+	public Artist(String mbid, String name, HashMap<String, Event> events){
 		this.mbid = mbid;
 		this.name = name;
-		this.img = img;
-		this.country = country;
-		this.homepage = homepage;
-		this.wiki = wiki;
-		this.isOnTour = isOnTour;
-		this.genres = genres;
-		this.members = members;
 		this.events = events;
 	}
 	
@@ -233,30 +228,6 @@ public class Artist {
 	
 		return json;
 		
-	}
-	
-	public void toJSON(File file){
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-		map.put("mbid", this.mbid);
-		map.put("name", this.name);
-		map.put("img", this.img);
-		map.put("country", this.country);
-		map.put("homepage", this.homepage);
-		map.put("wiki", this.wiki);
-		map.put("genres", genres);
-		map.put("members", members);
-	
-		ObjectMapper mapper = new ObjectMapper();
-		try{
-			mapper.writeValue(file, map);
-		} catch(JsonGenerationException e){
-			e.printStackTrace();
-		} catch(JsonMappingException e){
-			e.printStackTrace();
-		} catch(IOException e){
-			e.printStackTrace();
-		}
 	}
 	
 } // End of Class

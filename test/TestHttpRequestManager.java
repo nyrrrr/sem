@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import models.Artist;
@@ -73,15 +72,16 @@ public class TestHttpRequestManager {
 		String query = musicbrainz.getArtistInfo(artist);
 //		String query = musicbrainz.getResource("http://dbtune.org/musicbrainz/resource/artist/4753fcb7-9270-493a-974d-8daca4e49125");
 //		RDFNode node = sparqlManager.sendQuery(musicbrainz.ENDPOINT, query).get(0);
-		HashMap<RDFNode, RDFNode> nodes = sparqlManager.sendQuery(musicbrainz.ENDPOINT, query);
+		HashMap<RDFNode, RDFNode> nodes = sparqlManager.sendQuery(MusicbrainzSparqlFactory.ENDPOINT, query);
 		
 		System.out.println("----------");
 		System.out.println("----------");
 		params = LastfmUri.getInstance().getArtistEvents("Enter Shikari", false);
-		JsonNode json2 = request.sendRequest("GET", LastfmUri.getInstance().ENDPOINT, params);
+		LastfmUri.getInstance();
+		JsonNode json2 = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
 		System.out.println("----------");
 		query = musicbrainz.getArtistInfo("Enter Shikari");
-		sparqlManager.sendQuery(musicbrainz.ENDPOINT, query);
+		sparqlManager.sendQuery(MusicbrainzSparqlFactory.ENDPOINT, query);
 	}
 
 }

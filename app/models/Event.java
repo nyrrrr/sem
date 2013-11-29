@@ -1,14 +1,6 @@
 package models;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Event {
 
@@ -19,34 +11,41 @@ public class Event {
 	private Venue venue;
 	private ArrayList<Artist> artists;
 	
+	/**
+	 * Constructor - Creates an Event object and sets the variables.
+	 * @param id - A unique event id.
+	 * @param name - An event name.
+	 */
 	public Event(String id, String name){
 		this.id = id;
 		this.title = name;
 		artists = new ArrayList<Artist>();
 	}
 	
-	public Event(String id, String name, String date, String tickets){
-		this.id = id;
-		this.title = name;
-		this.date = date;
-		this.tickets = tickets;
-		artists = new ArrayList<Artist>();
-	}
-	
+	/**
+	 * Constructor - Creates an Event object and sets the variables.
+	 * @param id - A unique event id.
+	 * @param name - An event name.
+	 * @param artists - Artists that participate in this event.
+	 */
 	public Event(String id, String name, ArrayList<Artist> artists){
 		this.id = id;
 		this.title = name;
 		this.artists = artists;
 	}
 	
-	public Event(String id, String name, String date, String tickets, Venue venue, ArrayList<Artist> artists){
+	/**
+	 * Constructor - Creates an Event object and sets the variables.
+	 * @param id - A unique event id.
+	 * @param name - An event name.
+	 * @param venue - The venue of the event.
+	 * @param artists - Artists that participate in this event.
+	 */
+	public Event(String id, String name, Venue venue, ArrayList<Artist> artists){
 		this.id = id;
 		this.title = name;
-		this.date = date;
-		this.tickets = tickets;
 		this.venue = venue;
-		this.artists = artists;
-		
+		this.artists = artists;		
 	}
 	
 	public String getId() {
@@ -129,28 +128,6 @@ public class Event {
 		json = json.replaceAll(", ]", "]");
 		json = json.replaceAll(", }", "}");
 		return json;
-	}
-	
-	public void toJSON(File file){
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-		map.put("id", this.id);
-		map.put("title", this.title);
-		map.put("date", date);
-		map.put("tickets", this.tickets);
-		map.put("venue", this.venue);
-		map.put("artists", this.artists);
-	
-		ObjectMapper mapper = new ObjectMapper();
-		try{
-			mapper.writeValue(file, map);
-		} catch(JsonGenerationException e){
-			e.printStackTrace();
-		} catch(JsonMappingException e){
-			e.printStackTrace();
-		} catch(IOException e){
-			e.printStackTrace();
-		}
 	}
 	
 } // End of Class
