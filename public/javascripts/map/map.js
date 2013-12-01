@@ -1,5 +1,3 @@
-var reorderFromStart = document.URL.indexOf('#') !== -1;
-
 // center function
 jQuery.fn.center = function() {
 	this.css("position", "absolute");
@@ -9,6 +7,10 @@ jQuery.fn.center = function() {
 }
 // on page ready
 $(function() {
+	// TODO here needs to be some function that helps to start the application in query mode when someone adds a parameter to the URL
+	// TODO auto select radio button
+	reorderFromStart = document.URL.indexOf('#') !== -1;
+	pinCollection = null;
 	// style
 	generalStylingAndSetup();
 	if (MQA.fake === undefined) {
@@ -31,15 +33,20 @@ function generalStylingAndSetup() {
 
 	// this is for "savable" URLs...
 	if (reorderFromStart) {
-		// adjust overlay
-		$('#overlay').prepend($("#dpanel h1")).show().removeClass("center").addClass("header").dequeue();
+		// this will wait for the code to be executed when ALL all elements finished loading (after page.ready())
+		$(window).bind("load", function() {
+			// adjust overlay
+			var h1 = $('div#dpanel.maxi h1');
+			$('#overlay').prepend(h1);
+			// trigger map resize
+			$(window).trigger("resize");
+		});
+		$('#overlay').show().removeClass("center").addClass("header").dequeue();
 		// remove panel
-		$("#dpanel h3").remove();
+		$("#dpanel").hide();
 		// save state
 		$('body').data("moved", "true");
-		// trigger map resize
-		$(window).trigger("resize");
-		$('#map').show()
+		$('#map').show().css('top', "52px");
 		// submit button
 		$('#submit').show();
 		// radio buttons
@@ -67,12 +74,15 @@ function generalStylingAndSetup() {
 	$('#submit').button().click(function(event) {
 		// do not submit form or anything
 		event.preventDefault();
+		// clear map
+		map.removeAllShapes();
 		// handle user input only when a radio button has been selected and we are online!
 		if ($("input[type=radio]:checked").size() > 0 && (MQA.fake === undefined)) {
 			handleUserInput();
 		} else {
 			// TODO error handling
 		}
+		$(document).tooltip("option", "hide");
 	});
 	// radio buttons
 	$('#type').buttonset().click(function(event) {
@@ -107,8 +117,6 @@ function reorderDomElements() {
 	// save state
 	$('body').data("moved", "true");
 	// make map visible
-	//$('#map').css('top', $('.header').height() + "px");;
-	//$('#map div').css('overflow', 'visible');
 	// trigger map resize
 	var int = setInterval(function() {
 		if (!($('#map').is(":animated"))) {
@@ -124,8 +132,12 @@ function handleUserInput() {
 	// TODO input validation
 	if (true) {
 		// only reorder if it has not already be done
-		if ($('body').data("moved") === undefined && !reorderFromStart)
+		if ($('body').data("moved") === undefined && !reorderFromStart) {
 			reorderDomElements();
+		}
+
+		var query = $("#query").val() + "";
+		var type = $("input[type=radio]:checked").val();
 
 		$.ajax({
 			url : "/request",
@@ -134,24 +146,72 @@ function handleUserInput() {
 			dataType : "json",
 			data : {
 				// TODO we really need some input validation here... like a jQuery UI dialog or something
-				query : $("#query").val() + "",
-				type : $("input[type=radio]:checked").val()
+				query : query,
+				type : type
 			},
-			success : function(a, b, c) {
-				// debug
-				console.log("success");
-				console.log(a);
+			before : function () {
+				$("body").css("cursor", "progress");
 			},
-			error : function(a, b) {
+			success : function(data, textStatus, jqXHR) {
+				console.log("----- success - " + type + " -----");
+				if (type === "artist") {
+					pinCollection = new MQA.ShapeCollection();
+					$.each(data.events, function(eventID, eventObj) {
+						var venue = eventObj.venue;
+						if (venue.latitude !== "" && venue.longitude !== "") {
+							var info = new MQA.Poi({
+								lat : venue.latitude,
+								lng : venue.longitude
+							});
+
+							info.setRolloverContent('ROLLOVER TODO');
+
+							info.setInfoContentHTML('INFOWINDOW TODO');
+
+							map.addShape(info);
+						} else {
+							nominatimBackUpQuery(venue);
+						}
+					});
+				} else if (type === "location") {
+				} else if (type === "venue") {
+				} else {
+					// TODO
+				}
+				map.bestFit();
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
 				// debug
 				console.log("fail");
 				console.log(a)
+			},
+			complete : function () {
+				$("body").css("cursor", "default");
 			}
 		});
 
 	} else {
 		// TODO error handling?
 	}
+}
+
+// perform nominatim query when not enough geo info is provided
+function nominatimBackUpQuery(venue) {
+	// TODO test..
+	var nomQuery = "";
+	if (venue.street !== "") {
+		nomQuery = venue.street;
+	} else if (venue.name) {
+		nomQuery = venue.name;
+	}
+	if (venue.postalCode !== "" && nomQuery !== "")
+		nomQuery += "," + venue.postalCode;
+	if (venue.city !== "" && nomQuery !== "")
+		nomQuery += "," + venue.city;
+	if (venue.country !== "" && nomQuery !== "")
+		nomQuery += "," + venue.country;
+
+	// TODO nominatim query
 }
 
 /*
