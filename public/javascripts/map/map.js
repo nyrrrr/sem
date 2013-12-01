@@ -1,3 +1,5 @@
+var reorderFromStart = document.URL.indexOf('#') !== -1;
+
 // center function
 jQuery.fn.center = function() {
 	this.css("position", "absolute");
@@ -26,8 +28,26 @@ function generalStylingAndSetup() {
 			collision : "flipfit"
 		}
 	});
+
+	// this is for "savable" URLs...
+	if (reorderFromStart) {
+		// adjust overlay
+		$('#overlay').prepend($("#dpanel h1")).show().removeClass("center").addClass("header").dequeue();
+		// remove panel
+		$("#dpanel h3").remove();
+		// save state
+		$('body').data("moved", "true");
+		// trigger map resize
+		$(window).trigger("resize");
+		$('#map').show()
+		// submit button
+		$('#submit').show();
+		// radio buttons
+		$('#type').show();
+	}
+
 	// center overlay
-	if (!('WebkitTransform' in document.body.style || 'MozTransform' in document.body.style || 'OTransform' in document.body.style || 'transform' in document.body.style)) {
+	if (!reorderFromStart && !('WebkitTransform' in document.body.style || 'MozTransform' in document.body.style || 'OTransform' in document.body.style || 'transform' in document.body.style)) {
 		$('.center').center();
 	}
 	// input field focus
@@ -35,7 +55,12 @@ function generalStylingAndSetup() {
 		// when user types show next input elements
 		input : function() {
 			//$('.ui-tooltip-13').hide("fade", "fast");
-			$('#type').show("fade", "slow");
+			if (!reorderFromStart)
+				$('#type').show("fade", "slow");
+		}
+	}).keydown(function(event) {
+		if (event.keyCode == 13) {
+			$('#submit').trigger('click');
 		}
 	});
 	// submit button
@@ -51,9 +76,11 @@ function generalStylingAndSetup() {
 	});
 	// radio buttons
 	$('#type').buttonset().click(function(event) {
-		$('#submit').show("fade", "slow");
+		if (!reorderFromStart)
+			$('#submit').show("fade", "slow");
 	});
 }
+
 // resize map to screen width
 function resizeMapOnStart() {
 	$('#map').css({
@@ -61,6 +88,7 @@ function resizeMapOnStart() {
 		height : (window.innerHeight + "px"),
 	});
 }
+
 // resize map on window resize
 function resizeMapOnWindowResize() {
 	var wdw = $(window);
@@ -69,6 +97,7 @@ function resizeMapOnWindowResize() {
 		$('#map').css('top', "52px");
 	});
 }
+
 // guess what...
 function reorderDomElements() {
 	// adjust overlay
@@ -85,48 +114,46 @@ function reorderDomElements() {
 		if (!($('#map').is(":animated"))) {
 			clearInterval(int);
 			$(window).trigger("resize");
-			$('#map').effect( "slide", "slow" );
-			console.log($('.header').height());
+			$('#map').effect("slide", "slow");
 		}
 	}, 100);
 }
+
 // guess again...
 function handleUserInput() {
 	// TODO input validation
 	if (true) {
 		// only reorder if it has not already be done
-		if ($('body').data("moved") === undefined)
+		if ($('body').data("moved") === undefined && !reorderFromStart)
 			reorderDomElements();
-		$(function() {
-			$('#submit').click(function(evt) {
-				evt.preventDefault()
-				$.ajax({
-					url : "/request",
-					method : "post",
-					async : true,
-					dataType : "json",
-					data : {
-						// we really need some input validation here...
-						query : $("#query").val() + "",
-						type : $("input[type=radio]:checked").val()
-					},
-					success : function(a, b, c) {
-						// debug
-						console.log("success"); 
-						console.table(a);
-					},
-					error : function(a, b) {
-						// debug
-						console.log("fail");
-						console.table(a)
-					}
-				});
-			});
+
+		$.ajax({
+			url : "/request",
+			method : "post",
+			async : true,
+			dataType : "json",
+			data : {
+				// TODO we really need some input validation here... like a jQuery UI dialog or something
+				query : $("#query").val() + "",
+				type : $("input[type=radio]:checked").val()
+			},
+			success : function(a, b, c) {
+				// debug
+				console.log("success");
+				console.log(a);
+			},
+			error : function(a, b) {
+				// debug
+				console.log("fail");
+				console.log(a)
+			}
 		});
+
 	} else {
 		// TODO error handling?
 	}
 }
+
 /*
 // listener
 $(document).on('click', '#mapbutton', handleInput);
