@@ -246,7 +246,15 @@ public class Application extends Controller {
 								venue.setStreet(jVenue.get("location").get("street").toString().replaceAll("\"", ""));
 								venue.setPostalCode(jVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
 							}
-
+							
+							if(jVenue.get("image") != null){
+								for(JsonNode image : jVenue.get("image")){
+									if(image.get("size").toString().replaceAll("\"", "").equals("large")){
+										venue.setImg(image.get("#text").toString().replaceAll("\"", ""));
+									}
+								}
+							}
+							
 							// set venue and store Event in event list.
 							event.setVenue(venue);
 							eventList.put(event.getId(), event);
