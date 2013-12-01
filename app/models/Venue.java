@@ -163,7 +163,7 @@ public class Venue {
 			.append("\"phone\": ")		.append(this.phone != null? "\"" + this.phone + "\"" : null)			.append(", ")
 			.append("\"events\": [");			
 		for(String key : this.events.keySet()){
-			builder.append(this.events.get(key).toJSON())	.append(", ");
+			builder.append(this.events.get(key).toJSON(false))	.append(", ");
 		}
 		builder.append("]}");
 		

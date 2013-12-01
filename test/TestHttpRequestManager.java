@@ -28,8 +28,9 @@ public class TestHttpRequestManager {
 		SparqlQueryManager sparqlManager = SparqlQueryManager.getInstance();
 		
 		String params = LastfmUri.getInstance().getArtistEvents(artist, festivalsOnly);
-//		String params = LastfmUri.getInstance().getEventInfo(3669169);
-		JsonNode jsonLastfm = request.sendRequest("GET", LastfmUri.getInstance().ENDPOINT, params);
+LastfmUri.getInstance();
+		//		String params = LastfmUri.getInstance().getEventInfo(3669169);
+		JsonNode jsonLastfm = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
 		JsonNode events = jsonLastfm.get("events").get("event");
 		HashMap<String, Event> eventList = new HashMap<String, Event>();
 		for(JsonNode jEvent : events){

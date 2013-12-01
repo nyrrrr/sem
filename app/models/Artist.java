@@ -178,20 +178,6 @@ public class Artist {
 		}
 	}
 	
-	public boolean isGroup(){
-		if(members.size() > 1){
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean isSoloArtist(){
-		if(members.size() == 1){
-			return true;
-		}
-		return false;
-	}
-	
 	public String toJSON(boolean includeEvents){
 		StringBuilder builder = new StringBuilder("{")
 			.append("\"mbid\": ")			.append(this.mbid != null? "\"" + this.mbid + "\"" : null)				.append(", ")
@@ -215,7 +201,7 @@ public class Artist {
 		if(includeEvents){
 			builder.append("\"events\": [");
 			for(String key : this.events.keySet()){
-				builder.append(events.get(key).toJSON() + ", ");
+				builder.append(events.get(key).toJSON(true) + ", ");
 			}
 			builder.append("]");
 		}

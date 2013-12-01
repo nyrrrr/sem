@@ -108,19 +108,23 @@ public class Event {
 		}
 	}
 	
-	public String toJSON(){
+	public String toJSON(boolean includeVenue){
 		StringBuilder builder = new StringBuilder("{")
 			.append("\"id\": ")			.append(this.id != null? "\"" + this.id + "\"" : null)				.append(", ")
 			.append("\"name\": ")		.append(this.title != null? "\"" + this.title + "\"" : null)			.append(", ")
 			.append("\"date\": ")		.append(this.date != null? "\"" + this.date + "\"" : null)			.append(", ")
 			.append("\"tickets\": ")	.append(this.tickets != null? "\"" + this.tickets + "\"" : null)	.append(", ")
-			.append("\"venue\": ")		.append(this.venue != null? this.venue.toJSON() : null)				.append(", ")
 			.append("\"artists\": [");
 		
 		for(Artist artist : artists){
 			builder.append(artist.toJSON(false))	.append(", ");
 		}
 		builder.append("]");
+		
+		if(includeVenue){
+			builder.append(", ");
+			builder.append("\"venue\": ")		.append(this.venue != null? this.venue.toJSON() : null)				.append(", ");
+		}
 		
 		builder.append("}");
 		
