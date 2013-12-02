@@ -5,6 +5,7 @@ jQuery.fn.center = function() {
 	this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + $(window).scrollLeft()) + "px");
 	return this;
 }
+var map;
 // on page ready
 $(function() {
 
@@ -38,7 +39,7 @@ function init() {
 					lng : 8.46625
 				}, /*center of map in latitude/longitude */
 				mtype : 'osm', /*map type (osm)*/
-				bestFitMargin : 5, /*margin offset from the map viewport when applying a bestfit on shapes*/
+				bestFitMargin : 100, /*margin offset from the map viewport when applying a bestfit on shapes*/
 				zoomOnDoubleClick : true	/*zoom in when double-clicking on map*/
 			};
 
@@ -251,10 +252,7 @@ function addArtistInformationOnMap(data) {
 		infoContentHTML = "";
 		venue = eventObj.venue;
 		if (venue.latitude !== "" && venue.longitude !== "") {
-			info = new MQA.Poi({
-				lat : venue.latitude,
-				lng : venue.longitude
-			});
+			info = createPOI("info", venue.latitude, venue.longitude);
 		} else {
 			nominatimBackUpQuery(eventObj, data);
 			return;
@@ -302,43 +300,54 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 		async : true,
 		success : function(data, textStatus, jqXHR) {
 			if (data.length === 0 && !once) {
-				once = true;
 				if (nomQuery.indexOf(',') !== -1) {
 					console.log("----- retry nominatim request with modified query");
 					var retry = nomQuery.substr(nomQuery.indexOf(',') + 1);
 					retry = url.replace(nomQuery, retry);
 
-					nominatimRequest(retry, "", eventObj, pData, once);
+					nominatimRequest(retry, "", eventObj, pData, true);
 					return;
 				}
+				once = false;
 				return;
 				// TODO error handling
-			}
+			} else if (data.length === 0 ) return; //TODO error handling
+			
 			// TODO handle result
 			console.log("----- nominatim retrieval successful");
 			var displayName = data[0].display_name;
+			console.log(data, once);
 			if ((eventObj.venue.country !== "" && displayName.indexOf(eventObj.venue.country) !== -1) || (eventObj.venue.city !== "" && displayName.indexOf(eventObj.venue.city) !== -1)) {
-				info = new MQA.Poi({
-					lat : data[0].lat,
-					lng : data[0].lon
-				});
+				info = createPOI("info", data[0].lat, data[0].lon);
 
 				var infoContentHTML = "<h4>" + eventObj.title + (((eventObj.title == pData.name) && (eventObj.venue.name !== "")) ? " in " + eventObj.venue.name : " in " + ((displayName.indexOf(',') !== -1) ? (displayName.substr(0, displayName.indexOf(',')) === "undefined" ? (displayName.substr(11, displayName.substr(11).indexOf(',')) !== "undefined" ? displayName.substr(11, displayName.substr(11).indexOf(',')) : "") : "") : displayName)
 				) + "</h4>";
+				infoContentHTML += "";
 
 				info.setInfoContentHTML(infoContentHTML);
 				info.setDeclutterMode(true);
 				pinCollection.add(info);
 
 				map.addShapeCollection(pinCollection);
+				once = false;
 			}
 			//poi.setInfoContentHTML(data.display_name);
 			//poi.toggleInfoWindow();
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 			console.log(errorThrown);
+			once = false;
 			return null;
 			// TODO error handling
 		}
 	});
+}
+
+function createPOI(info, lat, lon) {
+	window[info] = new MQA.Poi({
+		lat : lat,
+		lng : lon
+	});
+	MQA.EventManager.addListener(window[info], 'mouseover', function () {});
+	return window[info];
 }
