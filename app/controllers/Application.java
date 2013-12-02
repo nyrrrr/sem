@@ -84,8 +84,9 @@ public class Application extends Controller {
 				e.printStackTrace();
 			}
 		} else if (queryString.equals("venue")) {
+			return TODO;
 		} else {
-			// TODO error handling
+			result = Json.parse("{error: 1337, message : 'It looks like no category was selected.'}");
 		}
 
 		// TODO trigger some kind of request that will return a JSON

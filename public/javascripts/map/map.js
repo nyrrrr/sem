@@ -8,12 +8,10 @@ jQuery.fn.center = function() {
 var map;
 // on page ready
 $(function() {
-
 	// TODO here needs to be some function that helps to start the application in query mode when someone adds a parameter to the URL
-	// TODO auto select radio button
 	reorderFromStart = document.URL.indexOf('#') !== -1;
 	pinCollection = null;
-
+	// init map
 	init();
 	// style
 	generalStylingAndSetup();
@@ -24,11 +22,9 @@ $(function() {
 		resizeMapOnWindowResize();
 	}
 });
-
 function init() {
 	if (window.MQA !== undefined) {
 		MQA.EventUtil.observe(window, 'load', function() {
-
 			// Create an object for options
 			var options = {
 				elt : document.getElementById('map'), /*ID of element on the page where you want the map added*/
@@ -42,23 +38,19 @@ function init() {
 				bestFitMargin : 100, /*margin offset from the map viewport when applying a bestfit on shapes*/
 				zoomOnDoubleClick : true	/*zoom in when double-clicking on map*/
 			};
-
 			// Construct an instance of MQA.TileMap with the options object
 			map = new MQA.TileMap(options);
-
 			// add controls
 			MQA.withModule('largezoom', 'viewoptions', 'geolocationcontrol', 'insetmapcontrol', 'mousewheel', function() {
 				map.addControl(new MQA.LargeZoom(), new MQA.MapCornerPlacement(MQA.MapCorner.TOP_LEFT, new MQA.Size(5, 5)));
 				map.addControl(new MQA.ViewOptions());
 				map.addControl(new MQA.GeolocationControl(), new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
-
 				// geo search
 				var gcontrol = new MQA.GeolocationControl();
 				gcontrol.onLocate = function(poi, position) {
 					sendRequest("", "location", position.coords.latitude, position.coords.longitude, 25);
 				};
 				map.addControl(gcontrol, new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
-
 				// Map Control options
 				var options = {
 					size : {
@@ -72,7 +64,6 @@ function init() {
 				map.addControl(new MQA.InsetMapControl(options), new MQA.MapCornerPlacement(MQA.MapCorner.BOTTOM_RIGHT));
 				map.enableMouseWheelZoom();
 			});
-
 			console.log("----- map initialized");
 		});
 		$(function() {
@@ -106,7 +97,6 @@ function generalStylingAndSetup() {
 			collision : "flipfit"
 		}
 	});
-
 	// this is for "savable" URLs...
 	if (reorderFromStart) {
 		// this will wait for the code to be executed when ALL all elements finished loading (after page.ready())
@@ -128,7 +118,6 @@ function generalStylingAndSetup() {
 		// radio buttons
 		$('#type').show();
 	}
-
 	// center overlay
 	if (!reorderFromStart && !('WebkitTransform' in document.body.style || 'MozTransform' in document.body.style || 'OTransform' in document.body.style || 'transform' in document.body.style)) {
 		$('.center').center();
@@ -148,6 +137,7 @@ function generalStylingAndSetup() {
 	});
 	// submit button
 	$('#submit').button().click(function(event) {
+		$('.ui-tooltip').hide("fade", "slow");
 		// do not submit form or anything
 		event.preventDefault();
 		// clear map
@@ -156,13 +146,13 @@ function generalStylingAndSetup() {
 		if ($('#query').val() !== "" && $("input[type=radio]:checked").size() > 0 && (MQA.fake === undefined)) {
 			handleUserInput();
 		} else {
-			// TODO error handling
+			createErrorDialog("<b>Incomplete input</b><br/><br/>Please make sure you entered a search term and selected a category.");
 		}
 		$(document).tooltip("option", "hide");
 	});
 	// radio buttons
 	$('#type').buttonset().click(function(event) {
-		$('.ui-tooltip').hide("fade", "slow");
+		$('.ui-tooltip').hide("fade", "fast");
 		if (!reorderFromStart)
 			$('#submit').show("fade", "slow");
 		if ($(type).find(':checked').val() == "location") {
@@ -175,7 +165,6 @@ function generalStylingAndSetup() {
 			$('#radius').hide()
 		}
 	});
-
 	// slider
 	$("#radius").removeClass('ui-slider-horizontal').position({
 		my : "bottom center+26",
@@ -183,7 +172,6 @@ function generalStylingAndSetup() {
 		of : $('#type label[for="location"]')
 	});
 	;
-
 }
 
 // resize map to screen width
@@ -224,11 +212,9 @@ function reorderDomElements() {
 
 // guess again...
 function handleUserInput() {
-	// TODO input validation
 	if ($('body').data("moved") === undefined && !reorderFromStart) {
 		reorderDomElements();
 	}
-
 	var query = $("#query").val() + "";
 	var type = $("input[type=radio]:checked").val();
 	var lat = "", lon = "";
@@ -247,7 +233,6 @@ function sendRequest(query, type, lat, lon, radius) {
 		dataType : "json",
 		timeout : 20000,
 		data : {
-			// TODO we really need some input validation here... like a jQuery UI dialog or something
 			query : query,
 			type : type,
 			lat : lat,
@@ -264,7 +249,6 @@ function sendRequest(query, type, lat, lon, radius) {
 		}
 	});
 }
-
 function getGeoLocation(query, lat, lon, radius, callback) {
 	$.ajax({
 		url : 'http://open.mapquestapi.com/nominatim/v1/search/' + query + '?format=json&addressdetails=1',
@@ -273,7 +257,6 @@ function getGeoLocation(query, lat, lon, radius, callback) {
 		timeout : 10000,
 		success : function(data, status, xhr) {
 			if (data.length === 0 || data[0].lat === "" || data[0].lon === "") {
-				// TODO
 				createErrorDialog("<b>Please try again or redefine your query!</b><br/></br>We could not find any specified location based on your input.");
 				return;
 			}
@@ -282,13 +265,11 @@ function getGeoLocation(query, lat, lon, radius, callback) {
 		error : genericErrorMessage()
 	});
 }
-
 function genericErrorMessage() {
 	return function(xhr, status, errorThrown) {
 		createErrorDialog("<b>ERROR:</b> " + status + "<br/>" + errorThrown);
 	};
 }
-
 function handleServerResponse(type) {
 	return function(data, textStatus, jqXHR) {
 		if (data.error === undefined && (data[0] !== undefined ? data[0].error === undefined : true)) {
@@ -301,7 +282,7 @@ function handleServerResponse(type) {
 				console.log(data);
 			} else if (type === "venue") {
 			} else {
-				// TODO
+				createErrorDialog("<b>ERROR:</b> An unknown error occured.");
 			}
 			map.bestFit();
 		} else {
@@ -321,13 +302,12 @@ function addArtistInformationOnMap(data) {
 			nominatimBackUpQuery(eventObj, data);
 			return;
 		}
-		//info.setRolloverContent('ROLLOVER TODO');
-		// TODO several artists
+		//info.setRolloverContent('ROLLOVER');
+		// TODO infoWindow
 		infoContentHTML += "<h4>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</h4>";
 
 		if (!info)
 			return;
-		// TODO handle error
 
 		info.setInfoContentHTML(infoContentHTML);
 		info.setDeclutterMode(true);
@@ -378,7 +358,7 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 			} else if (data.length === 0)// ignore result
 				return;
 
-			// TODO handle result
+			// TODO infoWindow
 			console.log("----- nominatim retrieval successful");
 			var displayName = data[0].display_name;
 			console.log(data, once);
