@@ -316,6 +316,58 @@ public class Application extends Controller {
 	}
 
 	/**
+	 * Allows to search for a venue via string (not ID). Returns a JsonNode list containing all search matches.
+	 * This is needed if a venue's events shall be retrieved. As no events can be searched via string, it is necessary
+	 * to search the venue and extract its ID. With this ID all events can be displayed.
+	 * @param name - The venue's name.
+	 * @param country - The country where to search at (NOTE: if this is null, the country parameter will not be set as this is optional).
+	 * @return venueList - An ArrayList with all Venue objects stored as JsonNodes.
+	 * @throws IOException
+	 */
+	public static ArrayList<JsonNode> searchVenue(String name, String country) throws IOException{
+		ArrayList<JsonNode> venueList = new ArrayList<JsonNode>();
+		
+		// create parameter for Last.fm query to retrieve venues
+		String params = LastfmUri.getInstance().getVenueSearch(name, country);
+		JsonNode jsonVenues = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
+		jsonVenues = jsonVenues.get("venuematches");
+		
+		// iterate through all matches and extract venue information
+		if(jsonVenues != null){
+			for(JsonNode venue : jsonVenues.get("venue")){
+				Venue v = new Venue(venue.get("id").toString().replaceAll("\"", ""), venue.get("name").toString().replaceAll("\"", ""));
+				v.setHomepage(venue.get("website").toString().replaceAll("\"", ""));
+				v.setPhone(venue.get("phonenumber").toString().replaceAll("\"", ""));
+				
+				if(venue.get("location") != null){
+					if(venue.get("location").get("geo:point") != null){
+						v.setLatitude(venue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
+						v.setLongitude(venue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+					}
+					v.setCity(venue.get("location").get("city").toString().replaceAll("\"", ""));
+					v.setCountry(venue.get("location").get("country").toString().replaceAll("\"", ""));
+					v.setStreet(venue.get("location").get("street").toString().replaceAll("\"", ""));
+					v.setPostalCode(venue.get("location").get("postalcode").toString().replaceAll("\"", ""));
+					
+				}
+				
+				if(venue.get("image") != null){
+					for(JsonNode image : venue.get("image")){
+						if(image.get("size").toString().replaceAll("\"", "").equals("large")){
+							v.setImg(image.get("#text").toString().replaceAll("\"", ""));
+						}
+					}
+				}
+				
+				// convert Venue to JsonNode and store it in the list.
+				venueList.add(Json.toJson(v));
+			}
+		}
+		
+		return venueList;
+	}
+	
+	/**
 	 * Send venue.getEvents request to Last.fm to event information. Parse
 	 * response and store the information in the respective objects - Artist,
 	 * Event, Venue.
