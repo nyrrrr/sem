@@ -95,6 +95,11 @@ div#overlay button#submit {
 #map div {
 	overflow: visible;
 }
+
+#map div .mqabasicwnd-client {
+	overflow : hidden;
+}
+
 .shadow {
 	-moz-box-shadow: 3px 3px 5px 6px #ccc;
 	-webkit-box-shadow: 3px 3px 5px 6px #ccc;

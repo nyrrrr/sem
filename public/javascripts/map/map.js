@@ -7,10 +7,13 @@ jQuery.fn.center = function() {
 }
 // on page ready
 $(function() {
+
 	// TODO here needs to be some function that helps to start the application in query mode when someone adds a parameter to the URL
 	// TODO auto select radio button
 	reorderFromStart = document.URL.indexOf('#') !== -1;
 	pinCollection = null;
+
+	init();
 	// style
 	generalStylingAndSetup();
 	if (MQA.fake === undefined) {
@@ -20,6 +23,70 @@ $(function() {
 		resizeMapOnWindowResize();
 	}
 });
+
+function init() {
+	if (window.MQA !== undefined) {
+		MQA.EventUtil.observe(window, 'load', function() {
+
+			// Create an object for options
+			var options = {
+				elt : document.getElementById('map'), /*ID of element on the page where you want the map added*/
+				zoom : 13,
+				// initial zoom level of the map
+				latLng : {
+					lat : 49.48703,
+					lng : 8.46625
+				}, /*center of map in latitude/longitude */
+				mtype : 'osm', /*map type (osm)*/
+				bestFitMargin : 5, /*margin offset from the map viewport when applying a bestfit on shapes*/
+				zoomOnDoubleClick : true	/*zoom in when double-clicking on map*/
+			};
+
+			// Construct an instance of MQA.TileMap with the options object
+			map = new MQA.TileMap(options);
+
+			// add controls
+			MQA.withModule('largezoom', 'viewoptions', 'geolocationcontrol', 'insetmapcontrol', 'mousewheel', function() {
+				map.addControl(new MQA.LargeZoom(), new MQA.MapCornerPlacement(MQA.MapCorner.TOP_LEFT, new MQA.Size(5, 5)));
+				map.addControl(new MQA.ViewOptions());
+				map.addControl(new MQA.GeolocationControl(), new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
+				// Map Control options
+				var options = {
+					size : {
+						width : 150,
+						height : 125
+					},
+					zoom : 3,
+					mapType : 'osmsat',
+					minimized : false
+				};
+				map.addControl(new MQA.InsetMapControl(options), new MQA.MapCornerPlacement(MQA.MapCorner.BOTTOM_RIGHT));
+				map.enableMouseWheelZoom();
+			});
+
+			console.log("----- map initialized");
+		});
+		$(function() {
+			$("#dpanel").html("<h1>SEM</h1><h3>Semantic Event Map</h3>").addClass("maxi");
+		});
+	} else {
+		MQA = new Object();
+		MQA.fake = true;
+		// show error
+		$(function() {
+			$("#dpanel").html("<b>#ERROR: Map could not be loaded.</b><br />Your internet connection might not be working correctly.");
+			$("#dpanel").css({
+				"position" : "relative",
+				"top" : "20px",
+				"width" : "30%",
+				"left" : "30%",
+				"font-size" : "25px",
+				"padding" : "5%"
+			}).show("fade", "slow").addClass("error", 1000);
+		});
+	}
+}
+
 // some basic css adjustments and simple input event handling
 function generalStylingAndSetup() {
 	// tooltips init
@@ -130,75 +197,86 @@ function reorderDomElements() {
 // guess again...
 function handleUserInput() {
 	// TODO input validation
-	if (true) {
-		// only reorder if it has not already be done
-		if ($('body').data("moved") === undefined && !reorderFromStart) {
-			reorderDomElements();
+	if ($('body').data("moved") === undefined && !reorderFromStart) {
+		reorderDomElements();
+	}
+
+	var query = $("#query").val() + "";
+	var type = $("input[type=radio]:checked").val();
+
+	$.ajax({
+		url : "/request",
+		method : "post",
+		async : true,
+		dataType : "json",
+		timeout : 20000,
+		data : {
+			// TODO we really need some input validation here... like a jQuery UI dialog or something
+			query : query,
+			type : type
+		},
+		before : function() {
+			$("body").css("cursor", "progress");
+		},
+		success : handleServerResponse(type),
+		error : function(jqXHR, textStatus, errorThrown) {
+			// debug
+			console.log("request failed");
+			console.log(errorThrown);
+		},
+		complete : function() {
+			$("body").css("cursor", "default");
 		}
+	});
+}
 
-		var query = $("#query").val() + "";
-		var type = $("input[type=radio]:checked").val();
-
-		$.ajax({
-			url : "/request",
-			method : "post",
-			async : true,
-			dataType : "json",
-			data : {
-				// TODO we really need some input validation here... like a jQuery UI dialog or something
-				query : query,
-				type : type
-			},
-			before : function () {
-				$("body").css("cursor", "progress");
-			},
-			success : function(data, textStatus, jqXHR) {
-				console.log("----- success - " + type + " -----");
-				if (type === "artist") {
-					pinCollection = new MQA.ShapeCollection();
-					$.each(data.events, function(eventID, eventObj) {
-						var venue = eventObj.venue;
-						if (venue.latitude !== "" && venue.longitude !== "") {
-							var info = new MQA.Poi({
-								lat : venue.latitude,
-								lng : venue.longitude
-							});
-
-							info.setRolloverContent('ROLLOVER TODO');
-
-							info.setInfoContentHTML('INFOWINDOW TODO');
-
-							map.addShape(info);
-						} else {
-							nominatimBackUpQuery(venue);
-						}
-					});
-				} else if (type === "location") {
-				} else if (type === "venue") {
-				} else {
-					// TODO
-				}
-				map.bestFit();
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				// debug
-				console.log("fail");
-				console.log(a)
-			},
-			complete : function () {
-				$("body").css("cursor", "default");
-			}
-		});
-
-	} else {
-		// TODO error handling?
+function handleServerResponse(type) {
+	return function(data, textStatus, jqXHR) {
+		var infoContentHTML, venue, info;
+		console.log("----- request response retrieved for: " + type);
+		pinCollection = new MQA.ShapeCollection();
+		if (type === "artist") {
+			addArtistInformationOnMap(data);
+		} else if (type === "location") {
+		} else if (type === "venue") {
+		} else {
+			// TODO
+		}
+		map.bestFit();
 	}
 }
 
+function addArtistInformationOnMap(data) {
+	$.each(data.events, function(eventID, eventObj) {
+		infoContentHTML = "";
+		venue = eventObj.venue;
+		if (venue.latitude !== "" && venue.longitude !== "") {
+			info = new MQA.Poi({
+				lat : venue.latitude,
+				lng : venue.longitude
+			});
+		} else {
+			nominatimBackUpQuery(eventObj, data);
+			return;
+		}
+		//info.setRolloverContent('ROLLOVER TODO');
+		// TODO several artists
+		infoContentHTML += "<h4>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</h4>";
+
+		if (!info)
+			return;
+		// TODO handle error
+
+		info.setInfoContentHTML(infoContentHTML);
+		info.setDeclutterMode(true);
+		pinCollection.add(info);
+	});
+	map.addShapeCollection(pinCollection);
+}
+
 // perform nominatim query when not enough geo info is provided
-function nominatimBackUpQuery(venue) {
-	// TODO test..
-	var nomQuery = "";
+function nominatimBackUpQuery(eventObj, data) {
+	var nomQuery = "", venue = eventObj.venue;
 	if (venue.street !== "") {
 		nomQuery = venue.street;
 	} else if (venue.name) {
@@ -211,101 +289,56 @@ function nominatimBackUpQuery(venue) {
 	if (venue.country !== "" && nomQuery !== "")
 		nomQuery += "," + venue.country;
 
-	// TODO nominatim query
+	var url = 'http://open.mapquestapi.com/nominatim/v1/search/' + nomQuery + '?format=json&addressdetails=1';
+	nominatimRequest(url, nomQuery, eventObj, data, false);
 }
 
-/*
-// listener
-$(document).on('click', '#mapbutton', handleInput);
+function nominatimRequest(url, nomQuery, eventObj, pData, once) {
+	$.ajax({
+		url : url,
+		dataType : 'json',
+		crossDomain : true,
+		timeout : 10000,
+		async : true,
+		success : function(data, textStatus, jqXHR) {
+			if (data.length === 0 && !once) {
+				once = true;
+				if (nomQuery.indexOf(',') !== -1) {
+					console.log("----- retry nominatim request with modified query");
+					var retry = nomQuery.substr(nomQuery.indexOf(',') + 1);
+					retry = url.replace(nomQuery, retry);
 
-// handle user input and invoke appropriate methods
-function handleInput() {
+					nominatimRequest(retry, "", eventObj, pData, once);
+					return;
+				}
+				return;
+				// TODO error handling
+			}
+			// TODO handle result
+			console.log("----- nominatim retrieval successful");
+			var displayName = data[0].display_name;
+			if ((eventObj.venue.country !== "" && displayName.indexOf(eventObj.venue.country) !== -1) || (eventObj.venue.city !== "" && displayName.indexOf(eventObj.venue.city) !== -1)) {
+				info = new MQA.Poi({
+					lat : data[0].lat,
+					lng : data[0].lon
+				});
 
-// wipe map
-map.removeShapeCollection();
+				var infoContentHTML = "<h4>" + eventObj.title + (((eventObj.title == pData.name) && (eventObj.venue.name !== "")) ? " in " + eventObj.venue.name : " in " + ((displayName.indexOf(',') !== -1) ? (displayName.substr(0, displayName.indexOf(',')) === "undefined" ? (displayName.substr(11, displayName.substr(11).indexOf(',')) !== "undefined" ? displayName.substr(11, displayName.substr(11).indexOf(',')) : "") : "") : displayName)
+				) + "</h4>";
 
-var userInput = $('#index-search').val();
-// input field
-var eventFirstMode;
-// determines query mode; should be set by some input fields
+				info.setInfoContentHTML(infoContentHTML);
+				info.setDeclutterMode(true);
+				pinCollection.add(info);
 
-if (isValidInput(userInput)) {
-eventFirstMode = determineQueryMode(userInput, eventFirstMode);
-executeQueries(eventFirstMode, userInput);
-} else {
-// handle invalid input somehow (play framework?)
+				map.addShapeCollection(pinCollection);
+			}
+			//poi.setInfoContentHTML(data.display_name);
+			//poi.toggleInfoWindow();
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			console.log(errorThrown);
+			return null;
+			// TODO error handling
+		}
+	});
 }
-}
-
-// TODO sparql and stuff
-function executeQueries(eventFirstMode, userInput) {
-if (eventFirstMode) {
-// TODO sparql
-// TODO map
-
-// dummy request
-MQA.withModule('nominatim', function() {
-
-// search and add points on map
-map.nominatimSearchAndAddLocation(userInput + ", Germany", function (response) {
-//map.nominatimSearchAndAddLocation('Arena, Germany', function (response) {
-// debug
-console.log(response);
-
-// TODO detailled erorr handling
-if(response.length === 0) alert("found not hits in Germany");
-
-// $.each(response, function (i, result) {
-// window.pois = MQA.ShapeCollection();
-// $.each(pois, function (n, poi) {
-// poi.setRolloverContent(i);
-// poi.setInfoContentHTML(i);
-// });
-// });
-});
-
-// zooms out (or in) so all points can be seen
-map.bestFit();
-
-});
-
-} else {
-// TODO
-}
-}
-
-// this method will determine which query mode is needed
-function determineQueryMode(userInput) {
-// TODO determine mode according to the radio buttons
-return true;
-}
-
-// creates a URI for querying the sparql service
-function createQueryUri(userInput) {
-return "";
-// TODO
-}
-
-// check whether the user's input is valid
-function isValidInput(userInput) {
-if (userInput === "") {
-// TODO handle missing input
-return false;
-} else {
-// TODO handle invalid input
-//return false;
-}
-return true;
-// TODO
-}
-
-// function addPoi() {
-// var info = new MQA.Poi({
-// lat : 51.227741,
-// lng : 6.773456
-// });
-// window.map.addShape(info);
-// 	window.map.bestFit();
-
-*/
-// }
