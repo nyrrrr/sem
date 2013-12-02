@@ -162,6 +162,7 @@ function generalStylingAndSetup() {
 	});
 	// radio buttons
 	$('#type').buttonset().click(function(event) {
+		$('.ui-tooltip').hide("fade", "slow");
 		if (!reorderFromStart)
 			$('#submit').show("fade", "slow");
 		if ($(type).find(':checked').val() == "location") {
@@ -177,10 +178,11 @@ function generalStylingAndSetup() {
 
 	// slider
 	$("#radius").removeClass('ui-slider-horizontal').position({
-				my : "bottom center+26",
-				at : "bottom center",
-				of : $('#type label[for="location"]')
-			});;
+		my : "bottom center+26",
+		at : "bottom center",
+		of : $('#type label[for="location"]')
+	});
+	;
 
 }
 
@@ -234,7 +236,7 @@ function handleUserInput() {
 	if (type !== "location")
 		sendRequest(query, type, null, null, radius);
 	else
-		getGeoLocation(query, lat, lon, radius, sendRequest );
+		getGeoLocation(query, lat, lon, radius, sendRequest);
 }
 
 function sendRequest(query, type, lat, lon, radius) {
@@ -256,11 +258,7 @@ function sendRequest(query, type, lat, lon, radius) {
 			$("body").css("cursor", "progress");
 		},
 		success : handleServerResponse(type),
-		error : function(jqXHR, textStatus, errorThrown) {
-			// debug
-			console.log("----- request failed - there might be a problem with the server");
-			console.log(errorThrown);
-		},
+		error : genericErrorMessage(),
 		complete : function() {
 			$("body").css("cursor", "default");
 		}
@@ -276,32 +274,45 @@ function getGeoLocation(query, lat, lon, radius, callback) {
 		success : function(data, status, xhr) {
 			if (data.length === 0 || data[0].lat === "" || data[0].lon === "") {
 				// TODO
-				alert("please try again!");
+				createErrorDialog("<b>Please try again or redefine your query!</b><br/></br>We could not find any specified location based on your input.");
 				return;
 			}
 			callback(query, "location", data[0].lat, data[0].lon, radius);
 		},
-		error : function(xhr, status, errorThrown) {
-			// TODO
-		}
+		error : genericErrorMessage()
 	});
+}
+
+function genericErrorMessage() {
+	return function(xhr, status, errorThrown) {
+		createErrorDialog("<b>ERROR:</b> " + status + "<br/>" + errorThrown);
+	};
 }
 
 function handleServerResponse(type) {
 	return function(data, textStatus, jqXHR) {
-		var infoContentHTML, venue, info;
-		console.log("----- request response retrieved for: " + type);
-		pinCollection = new MQA.ShapeCollection();
-		if (type === "artist") {
-			addArtistInformationOnMap(data);
-		} else if (type === "location") {
-			console.log(data);
-		} else if (type === "venue") {
-		} else {
-			// TODO
+		if (data.error === undefined && (data[0] !== undefined ? data[0].error === undefined : true)) {
+			var infoContentHTML, venue, info;
+			console.log("----- request response retrieved for: " + type);
+			pinCollection = new MQA.ShapeCollection();
+			if (type === "artist") {
+				addArtistInformationOnMap(data);
+			} else if (type === "location") {
+				console.log(data);
+			} else if (type === "venue") {
+			} else {
+				// TODO
+			}
+			map.bestFit();
 		}
-		map.bestFit();
-	}
+		else {
+			var html = (data.message !== undefined 
+							? data.message 
+							: (data[0].message !== undefined 
+								? data[0].message : "An unknown error occured while querying last.fm."));
+			createErrorDialog("<b>Please try again or redefine your query!</b><br/></br>" + html);
+		}
+	};
 }
 
 function addArtistInformationOnMap(data) {
@@ -367,10 +378,9 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 				}
 				once = false;
 				return;
-				// TODO error handling
-			} else if (data.length === 0)
+
+			} else if (data.length === 0)// ignore result
 				return;
-			//TODO error handling
 
 			// TODO handle result
 			console.log("----- nominatim retrieval successful");
@@ -393,12 +403,7 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 			//poi.setInfoContentHTML(data.display_name);
 			//poi.toggleInfoWindow();
 		},
-		error : function(jqXHR, textStatus, errorThrown) {
-			console.log(errorThrown);
-			once = false;
-			return null;
-			// TODO error handling
-		}
+		error : genericErrorMessage()
 	});
 }
 
@@ -410,4 +415,15 @@ function createPOI(info, lat, lon) {
 	MQA.EventManager.addListener(window[info], 'mouseover', function() {
 	});
 	return window[info];
+}
+
+function createErrorDialog(html) {
+	$("#error-panel").html(html).dialog({
+		modal : true,
+		buttons : {
+			Ok : function() {
+				$(this).dialog("close");
+			}
+		}
+	});
 }

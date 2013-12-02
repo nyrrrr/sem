@@ -164,7 +164,6 @@ public class LastfmUri {
 		if(isJSON){
 			uri.append("&format=json");
 		}
-		uri.append("&limit=25");
 
 		return uri.toString();
 		
