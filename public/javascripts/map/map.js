@@ -204,7 +204,12 @@ function handleUserInput() {
 
 	var query = $("#query").val() + "";
 	var type = $("input[type=radio]:checked").val();
+	var lat = "", lon = "";
+	if ( type !== "location")sendRequest(query, type, null, null);
+	else getGeoLocation(query, lat, lon, sendRequest);
+}
 
+function sendRequest (query, type, lat, lon) {
 	$.ajax({
 		url : "/request",
 		method : "post",
@@ -214,7 +219,9 @@ function handleUserInput() {
 		data : {
 			// TODO we really need some input validation here... like a jQuery UI dialog or something
 			query : query,
-			type : type
+			type : type,
+			lat : lat,
+			lon : lon
 		},
 		before : function() {
 			$("body").css("cursor", "progress");
@@ -222,13 +229,33 @@ function handleUserInput() {
 		success : handleServerResponse(type),
 		error : function(jqXHR, textStatus, errorThrown) {
 			// debug
-			console.log("request failed");
+			console.log("----- request failed - there might be a problem with the server");
 			console.log(errorThrown);
 		},
 		complete : function() {
 			$("body").css("cursor", "default");
 		}
 	});
+}
+
+function getGeoLocation(query, lat, lon, callback) {
+	$.ajax ( {
+		url : 'http://open.mapquestapi.com/nominatim/v1/search/' + query + '?format=json&addressdetails=1',
+		crossDomain : true,
+		async : true,
+		timeout : 10000,
+		success : function (data, status, xhr) {
+			if (data.length === 0 || data[0].lat === "" || data[0].lon === "") {
+				// TODO 
+				alert("please try again!");
+				return;
+			}
+			callback(query, "location", data[0].lat, data[0].lon);
+		},
+		error : function (xhr, status, errorThrown) {
+			// TODO
+		}
+	}) ;
 }
 
 function handleServerResponse(type) {
@@ -239,6 +266,7 @@ function handleServerResponse(type) {
 		if (type === "artist") {
 			addArtistInformationOnMap(data);
 		} else if (type === "location") {
+			console.log(data);
 		} else if (type === "venue") {
 		} else {
 			// TODO
@@ -311,8 +339,10 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 				once = false;
 				return;
 				// TODO error handling
-			} else if (data.length === 0 ) return; //TODO error handling
-			
+			} else if (data.length === 0)
+				return;
+			//TODO error handling
+
 			// TODO handle result
 			console.log("----- nominatim retrieval successful");
 			var displayName = data[0].display_name;
@@ -348,6 +378,7 @@ function createPOI(info, lat, lon) {
 		lat : lat,
 		lng : lon
 	});
-	MQA.EventManager.addListener(window[info], 'mouseover', function () {});
+	MQA.EventManager.addListener(window[info], 'mouseover', function() {
+	});
 	return window[info];
 }

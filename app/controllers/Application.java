@@ -21,6 +21,8 @@ import play.mvc.Result;
 import views.html.map;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public class Application extends Controller {
@@ -76,7 +78,17 @@ public class Application extends Controller {
 			
 			// TODO error handling depending on result object
 		}
-		else if (queryString.equals("location")) {}
+		else if (queryString.equals("location")) {
+			try {
+				ArrayNode a = JsonNodeFactory.instance.arrayNode();
+				// TODO remove 25 (def value) and implement selector on UI
+				a.addAll(getLocalEvents(req.lon, req.lat, 25, false)); 
+				result = a;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		else if (queryString.equals("venue")) {}
 		else {
 			// TODO error handling
@@ -104,7 +116,7 @@ public class Application extends Controller {
 	 * @return eventNodes - A list of all events stored as JsonNode objects.
 	 * @throws IOException
 	 */
-	public ArrayList<JsonNode> getLocalEvents(String longitude, String latitude, int radius, boolean festivalsOnly) throws IOException {
+	public static ArrayList<JsonNode> getLocalEvents(String longitude, String latitude, int radius, boolean festivalsOnly) throws IOException {
 		ArrayList<JsonNode> eventNodes = new ArrayList<JsonNode>();
 
 		// create parameter for Last.fm query to retrieve local event info

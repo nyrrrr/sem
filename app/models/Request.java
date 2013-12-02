@@ -6,4 +6,5 @@ public class Request {
 	@Required
 	public String query;
 	public String type;
+	public String lat, lon;
 }

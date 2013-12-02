@@ -142,6 +142,7 @@ public class LastfmUri {
 		uri.append("&");
 		uri.append("&api_key=");
 		uri.append(API_KEY);
+		uri.append("&limit=50");
 		
 		if(longitude != null && latitude != null){		
 			longitude = URLEncoder.encode(longitude, "UTF-8");
@@ -191,6 +192,7 @@ public class LastfmUri {
 		uri.append(search);
 		uri.append("&api_key=");
 		uri.append(API_KEY);
+		uri.append("&limit=50");
 		if(festivalsOnly){
 			uri.append("&festivalsonly=1");
 		}
