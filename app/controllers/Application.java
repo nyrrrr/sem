@@ -1,19 +1,8 @@
 package controllers;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-import org.apache.http.impl.conn.tsccm.RefQueueHandler;
-
-import models.Artist;
-import models.Event;
-import models.HttpRequestManager;
-import models.LastfmUri;
-import models.MusicbrainzSparqlFactory;
 import models.Request;
-import models.SparqlQueryManager;
-import models.Venue;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -23,7 +12,6 @@ import views.html.map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public class Application extends Controller {
 

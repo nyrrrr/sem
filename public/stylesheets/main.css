@@ -62,9 +62,9 @@ div#overlay select#radius {
 	display: none;
 }
 /*div#overlay.center select#radius {
-	left: 35%;
-	top: -20%;
-}*/
+ left: 35%;
+ top: -20%;
+ }*/
 div#overlay.header input#query {
 	padding: 0.25%;
 }
@@ -133,8 +133,7 @@ div#overlay button#submit {
 	padding: 1%;
 	text-align: center;
 }
-.center {
-	position: relative;body {
+body {
 	background-color: #FFF;
 	overflow: hidden;
 	font: 70% "Trebuchet MS", sans-serif;
@@ -271,8 +270,7 @@ div#overlay button#submit {
 }
 .center {
 	position: relative;
-	margin-left: 25%;
-	margin-top: 3%;
+	margin: 3% 0 0 25%;
 	/*transform: translate(-50%, -50%);
 	 -webkit-transform: translate(-50%,-50%);
 	 -ms-transform: translate(-50%,-50%);
@@ -316,13 +314,13 @@ div#overlay button#submit {
 .min, .min:hover, .max, .max:hover {
 	background-image: url("http://developer.mapquest.com/content/documentation/common/images/min_max_blue.png") !important;
 }
-	margin-left: 25%;
-	margin-top: 3%;
-	/*transform: translate(-50%, -50%);
-	 -webkit-transform: translate(-50%,-50%);
-	 -ms-transform: translate(-50%,-50%);
-	 -moz-transform: translate(-50%,-50%);
-	 -o-transform: translate(-50%,-50%);*/
+margin-left: 25%;
+margin-top: 3%;
+/*transform: translate(-50%, -50%);
+ -webkit-transform: translate(-50%,-50%);
+ -ms-transform: translate(-50%,-50%);
+ -moz-transform: translate(-50%,-50%);
+ -o-transform: translate(-50%,-50%);*/
 }
 .error {
 	background: #cd0a0a url(images/ui-bg_glass_95_fef1ec_1x400.png) 50% 50% repeat-x;
