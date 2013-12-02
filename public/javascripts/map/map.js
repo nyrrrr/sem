@@ -51,6 +51,14 @@ function init() {
 				map.addControl(new MQA.LargeZoom(), new MQA.MapCornerPlacement(MQA.MapCorner.TOP_LEFT, new MQA.Size(5, 5)));
 				map.addControl(new MQA.ViewOptions());
 				map.addControl(new MQA.GeolocationControl(), new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
+
+				// geo search
+				var gcontrol = new MQA.GeolocationControl();
+				gcontrol.onLocate = function(poi, position) {
+					sendRequest("", "location", position.coords.latitude, position.coords.longitude);
+				};
+				map.addControl(gcontrol, new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
+
 				// Map Control options
 				var options = {
 					size : {
@@ -205,11 +213,13 @@ function handleUserInput() {
 	var query = $("#query").val() + "";
 	var type = $("input[type=radio]:checked").val();
 	var lat = "", lon = "";
-	if ( type !== "location")sendRequest(query, type, null, null);
-	else getGeoLocation(query, lat, lon, sendRequest);
+	if (type !== "location")
+		sendRequest(query, type, null, null);
+	else
+		getGeoLocation(query, lat, lon, sendRequest);
 }
 
-function sendRequest (query, type, lat, lon) {
+function sendRequest(query, type, lat, lon) {
 	$.ajax({
 		url : "/request",
 		method : "post",
@@ -239,23 +249,23 @@ function sendRequest (query, type, lat, lon) {
 }
 
 function getGeoLocation(query, lat, lon, callback) {
-	$.ajax ( {
+	$.ajax({
 		url : 'http://open.mapquestapi.com/nominatim/v1/search/' + query + '?format=json&addressdetails=1',
 		crossDomain : true,
 		async : true,
 		timeout : 10000,
-		success : function (data, status, xhr) {
+		success : function(data, status, xhr) {
 			if (data.length === 0 || data[0].lat === "" || data[0].lon === "") {
-				// TODO 
+				// TODO
 				alert("please try again!");
 				return;
 			}
 			callback(query, "location", data[0].lat, data[0].lon);
 		},
-		error : function (xhr, status, errorThrown) {
+		error : function(xhr, status, errorThrown) {
 			// TODO
 		}
-	}) ;
+	});
 }
 
 function handleServerResponse(type) {
