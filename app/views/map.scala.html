@@ -15,7 +15,15 @@
 			<label for="location" title="In radius mode this will show you all the events next to location you enter">Radius</label>
 			<input type="radio" id="venue" name="type" value="venue">
 			<label for="venue" title="This will return all the events taking place in the entered venue.">Venue</label>
-		</div >
+		</div>
+
+		<select id="radius">
+			<option value="5">5km</option>
+			<option value="10">10km</option>
+			<option value="25" selected="selected">25km</option>
+			<option value="50">50km</option>
+			<option value="100">100km</option>
+		</select>
 
 		<button id="submit" class="ui-state-default ui-corner-all ui-state-hover" title="Start search!">
 			<span class=" ui-icon ui-icon-play" title="Start search!"> OK </span>

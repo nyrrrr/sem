@@ -55,7 +55,7 @@ function init() {
 				// geo search
 				var gcontrol = new MQA.GeolocationControl();
 				gcontrol.onLocate = function(poi, position) {
-					sendRequest("", "location", position.coords.latitude, position.coords.longitude);
+					sendRequest("", "location", position.coords.latitude, position.coords.longitude, 25);
 				};
 				map.addControl(gcontrol, new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
 
@@ -153,7 +153,7 @@ function generalStylingAndSetup() {
 		// clear map
 		map.removeAllShapes();
 		// handle user input only when a radio button has been selected and we are online!
-		if ($("input[type=radio]:checked").size() > 0 && (MQA.fake === undefined)) {
+		if ($('#query').val() !== "" && $("input[type=radio]:checked").size() > 0 && (MQA.fake === undefined)) {
 			handleUserInput();
 		} else {
 			// TODO error handling
@@ -164,7 +164,24 @@ function generalStylingAndSetup() {
 	$('#type').buttonset().click(function(event) {
 		if (!reorderFromStart)
 			$('#submit').show("fade", "slow");
+		if ($(type).find(':checked').val() == "location") {
+			$('#radius').show().position({
+				my : "bottom center+26",
+				at : "bottom center",
+				of : $('#type label[for="location"]')
+			});
+		} else {
+			$('#radius').hide()
+		}
 	});
+
+	// slider
+	$("#radius").removeClass('ui-slider-horizontal').position({
+				my : "bottom center+26",
+				at : "bottom center",
+				of : $('#type label[for="location"]')
+			});;
+
 }
 
 // resize map to screen width
@@ -213,13 +230,14 @@ function handleUserInput() {
 	var query = $("#query").val() + "";
 	var type = $("input[type=radio]:checked").val();
 	var lat = "", lon = "";
+	var radius = $('#radius :selected').val();
 	if (type !== "location")
-		sendRequest(query, type, null, null);
+		sendRequest(query, type, null, null, radius);
 	else
-		getGeoLocation(query, lat, lon, sendRequest);
+		getGeoLocation(query, lat, lon, radius, sendRequest );
 }
 
-function sendRequest(query, type, lat, lon) {
+function sendRequest(query, type, lat, lon, radius) {
 	$.ajax({
 		url : "/request",
 		method : "post",
@@ -231,7 +249,8 @@ function sendRequest(query, type, lat, lon) {
 			query : query,
 			type : type,
 			lat : lat,
-			lon : lon
+			lon : lon,
+			radius : radius
 		},
 		before : function() {
 			$("body").css("cursor", "progress");
@@ -248,7 +267,7 @@ function sendRequest(query, type, lat, lon) {
 	});
 }
 
-function getGeoLocation(query, lat, lon, callback) {
+function getGeoLocation(query, lat, lon, radius, callback) {
 	$.ajax({
 		url : 'http://open.mapquestapi.com/nominatim/v1/search/' + query + '?format=json&addressdetails=1',
 		crossDomain : true,
@@ -260,7 +279,7 @@ function getGeoLocation(query, lat, lon, callback) {
 				alert("please try again!");
 				return;
 			}
-			callback(query, "location", data[0].lat, data[0].lon);
+			callback(query, "location", data[0].lat, data[0].lon, radius);
 		},
 		error : function(xhr, status, errorThrown) {
 			// TODO

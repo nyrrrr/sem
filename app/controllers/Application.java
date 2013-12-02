@@ -82,7 +82,7 @@ public class Application extends Controller {
 			try {
 				ArrayNode a = JsonNodeFactory.instance.arrayNode();
 				// TODO remove 25 (def value) and implement selector on UI
-				a.addAll(getLocalEvents(req.lon, req.lat, 25, false)); 
+				a.addAll(getLocalEvents(req.lon, req.lat, Integer.parseInt(req.radius), false)); 
 				result = a;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

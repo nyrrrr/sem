@@ -56,6 +56,15 @@ div#overlay.header input#query, div#overlay.header button#submit {
 	margin-top: 1%;
 	vertical-align: middle;
 }
+div#overlay select#radius {
+	height: 23px;
+	/*margin-top: 1.25%;*/
+	display: none;
+}
+/*div#overlay.center select#radius {
+	left: 35%;
+	top: -20%;
+}*/
 div#overlay.header input#query {
 	padding: 0.25%;
 }
@@ -97,7 +106,7 @@ div#overlay button#submit {
 }
 
 #map div .mqabasicwnd-client {
-	overflow : hidden;
+	overflow: hidden;
 }
 
 .shadow {
