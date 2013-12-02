@@ -304,12 +304,8 @@ function handleServerResponse(type) {
 				// TODO
 			}
 			map.bestFit();
-		}
-		else {
-			var html = (data.message !== undefined 
-							? data.message 
-							: (data[0].message !== undefined 
-								? data[0].message : "An unknown error occured while querying last.fm."));
+		} else {
+			var html = (data.message !== undefined ? data.message : (data[0].message !== undefined ? data[0].message : "An unknown error occured while querying last.fm."));
 			createErrorDialog("<b>Please try again or redefine your query!</b><br/></br>" + html);
 		}
 	};

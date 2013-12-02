@@ -76,8 +76,8 @@ public class Application extends Controller {
 		} else if (queryString.equals("location")) {
 			try {
 				ArrayNode a = JsonNodeFactory.instance.arrayNode();
-				// TODO remove 25 (def value) and implement selector on UI
-				a.addAll(RequestController.getLocalEvents(req.lon, req.lat, Integer.parseInt(req.radius), false));
+				// here we need to flip lat and lon... don't ask me why...
+				a.addAll(RequestController.getLocalEvents(req.lat, req.lon, Integer.parseInt(req.radius), false));
 				result = a;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
