@@ -6,6 +6,7 @@ import java.util.HashMap;
 public class Artist {
 
 	private String mbid;
+	private String lastfm;
 	private String name;
 	private String img;
 	private String country;
@@ -70,6 +71,14 @@ public class Artist {
 		this.mbid = mbid;
 	}
 	
+	public String getLastfm() {
+		return lastfm;
+	}
+
+	public void setLastfm(String lastfm) {
+		this.lastfm = lastfm;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -181,6 +190,7 @@ public class Artist {
 	public String toJSON(boolean includeEvents){
 		StringBuilder builder = new StringBuilder("{")
 			.append("\"mbid\": ")			.append(this.mbid != null? "\"" + this.mbid + "\"" : null)				.append(", ")
+			.append("\"lastfm\": ")			.append(this.lastfm != null? "\"" + this.lastfm + "\"" : null)			.append(", ")
 			.append("\"name\": ")			.append(this.name != null? "\"" + this.name + "\"" : null)				.append(", ")
 			.append("\"img\": ")			.append(this.img != null? "\"" + this.img + "\"" : null)				.append(", ")
 			.append("\"country\": ")		.append(this.country != null? "\"" + this.country + "\"" : null)		.append(", ")

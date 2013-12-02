@@ -5,7 +5,7 @@ import java.net.URLEncoder;
 
 /**
  * This class handles the creation of parameters for RESTful requests towards the Last.fm API.
- * @author Ricardo Lüeer
+ * @author Ricardo Lüer
  *
  */
 public class LastfmUri {
@@ -132,8 +132,8 @@ public class LastfmUri {
 	 * @return parameter string for requesting the Last.fm API
 	 * @throws UnsupportedEncodingException
 	 */
-	public String getGeoEvents(String longitude, String latitude, int distance, boolean festivalsOnly) throws UnsupportedEncodingException{
-	
+	public String getGeoEvents(String latitude, String longitude, int distance, boolean festivalsOnly) throws UnsupportedEncodingException{
+		
 		StringBuilder uri = new StringBuilder(100);
 		
 		//build uri
@@ -164,6 +164,7 @@ public class LastfmUri {
 		if(isJSON){
 			uri.append("&format=json");
 		}
+		uri.append("&limit=25");
 
 		return uri.toString();
 		
@@ -179,6 +180,7 @@ public class LastfmUri {
 	 * @throws UnsupportedEncodingException
 	 */
 	public String lastfmURI(String methodParent, String method, String search, boolean festivalsOnly) throws UnsupportedEncodingException{
+		
 		// encode search term
 		search = URLEncoder.encode(search, "UTF-8");
 		
@@ -195,6 +197,9 @@ public class LastfmUri {
 		uri.append("&limit=50");
 		if(festivalsOnly){
 			uri.append("&festivalsonly=1");
+		}
+		if(methodParent == ARTIST){
+			uri.append("&autocorrect=1");
 		}
 		if(isJSON){
 			uri.append("&format=json");

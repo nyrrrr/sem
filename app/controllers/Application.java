@@ -125,7 +125,7 @@ public class Application extends Controller {
 		jsonGeoEvents = jsonGeoEvents.get("events");
 
 		// iterate through each event, create object and set variables
-		if (jsonGeoEvents.get("event") != null) {
+		if (jsonGeoEvents != null && jsonGeoEvents.get("event") != null) {
 			for (JsonNode event : jsonGeoEvents.get("event")) {
 				Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
 				e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
@@ -134,6 +134,12 @@ public class Application extends Controller {
 					for (JsonNode artist : event.get("artists").get("artist")) {
 						Artist a = new Artist(artist.toString().replaceAll("\"", ""));
 						e.addArtist(a);
+					}
+				}
+				
+				if (event.get("tags") != null){
+					for (JsonNode tag : event.get("tags").get("tag")){
+						e.addTag(tag.toString().replaceAll("\"", ""));
 					}
 				}
 
@@ -200,6 +206,7 @@ public class Application extends Controller {
 
 			// create artist with name and mbid (if existing)
 			Artist a = new Artist(mbid, name);
+			a.setLastfm(jsonArtistInfo.get("url").toString().replaceAll("\"", ""));
 
 			// get whether the artist is on tour or not
 			if (jsonArtistInfo.get("ontour").toString().replaceAll("\"", "").equals("1")) {
@@ -212,6 +219,13 @@ public class Application extends Controller {
 					if (image.get("size").toString().replaceAll("\"", "").equals("large"))
 						;
 					a.setImg(image.get("#text").toString().replaceAll("\"", ""));
+				}
+			}
+			
+			// get genres
+			if(jsonArtistInfo.get("tags") != null){
+				for(JsonNode genre : jsonArtistInfo.get("tags").get("tag")){
+					a.addGenre(genre.get("name").toString().replaceAll("\"", ""));
 				}
 			}
 
@@ -314,7 +328,7 @@ public class Application extends Controller {
 	 * @return a JsonNode instance containing venue and event information.
 	 * @throws IOException 
 	 */
-	public JsonNode getVenueEvents(String id, boolean festivalsOnly) throws IOException {
+	public static JsonNode getVenueEvents(String id, boolean festivalsOnly) throws IOException {
 
 		// create parameter for Last.fm query to retrieve venue info
 		// (especially events)
@@ -327,7 +341,13 @@ public class Application extends Controller {
 		Venue venue = null;
 		boolean isFirst = true;
 		if (jsonVenueEvents != null) {
-			for (JsonNode event : jsonVenueEvents.get("event")) {
+			JsonNode eventNodes;
+			if(jsonVenueEvents.size() > 1){
+				eventNodes = jsonVenueEvents.get("event");
+			} else {
+				eventNodes = jsonVenueEvents;
+			}
+			for (JsonNode event : eventNodes) {
 
 				// for the first element in the list, extract venue
 				// information (stored in all events, but only needed once)
@@ -366,11 +386,12 @@ public class Application extends Controller {
 
 				// extract event information, store it in Event instance and
 				// add it to the Venue instance
+				System.out.println(event.toString());
 				Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
 				e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
 				e.setTickets(event.get("website").toString().replaceAll("\"", ""));
 				ArrayList<Artist> artists = new ArrayList<Artist>();
-				if (event.get("artists") != null) {
+				if(event.get("artists") != null) {
 					for (JsonNode artist : event.get("artists").get("artist")) {
 						Artist a = new Artist(artist.toString().replaceAll("\"", ""));
 						artists.add(a);
@@ -378,6 +399,12 @@ public class Application extends Controller {
 				}
 				e.setArtists(artists);
 
+				if(event.get("tags") != null){
+					for(JsonNode tag : event.get("tags").get("tag")){
+						e.addTag(tag.toString().replaceAll("\"", ""));
+					}
+				}
+				
 				if (venue != null) {
 					venue.addEvent(e);
 				}
@@ -393,13 +420,15 @@ public class Application extends Controller {
 
 	}
 
-//	public static void main(String[] args) throws IOException {
-//		Application app = new Application();
-//
-//		System.out.println(app.getArtistEvents("Boyz II Men", false).toString());
-//		System.out.println(app.getLocalEvents(null, null, 20, false));
-//		System.out.println(app.getVenueEvents("8908030", false));
-//
-//	}
+	public static void main(String[] args) throws IOException {
+
+//		System.out.println(Application.getArtistEvents("Boys II Man", false).toString());
+//		System.out.println(Application.getLocalEvents(null, null, 20, false));
+		System.out.println(Application.getVenueEvents("8908030", false));
+//		System.out.println(Application.getArtistEvents("Max Herre", false).toString());			// NullPointerException for whatever reason
+//		System.out.println(Application.getLocalEvents("49.29180", "8.264116", 20, false));
+		System.out.println(Application.getVenueEvents("8908030", true));
+
+	}
 
 }

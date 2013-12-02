@@ -10,6 +10,7 @@ public class Event {
 	private String tickets;
 	private Venue venue;
 	private ArrayList<Artist> artists;
+	private ArrayList<String> tags;
 	
 	/**
 	 * Constructor - Creates an Event object and sets the variables.
@@ -20,6 +21,7 @@ public class Event {
 		this.id = id;
 		this.title = name;
 		artists = new ArrayList<Artist>();
+		tags = new ArrayList<String>();
 	}
 	
 	/**
@@ -32,6 +34,7 @@ public class Event {
 		this.id = id;
 		this.title = name;
 		this.artists = artists;
+		tags = new ArrayList<String>();
 	}
 	
 	/**
@@ -46,6 +49,7 @@ public class Event {
 		this.title = name;
 		this.venue = venue;
 		this.artists = artists;		
+		tags = new ArrayList<String>();
 	}
 	
 	public String getId() {
@@ -108,6 +112,26 @@ public class Event {
 		}
 	}
 	
+	public ArrayList<String> getTags() {
+		return tags;
+	}
+
+	public void setTags(ArrayList<String> tags) {
+		this.tags = tags;
+	}
+	
+	public void addTag(String tag){
+		if(!tags.contains(tag)){
+			tags.add(tag);
+		}
+	}
+	
+	public void deleteTag(String tag){
+		if(tags.contains(tag)){
+			tags.remove(tag);
+		}
+	}
+
 	public String toJSON(boolean includeVenue){
 		StringBuilder builder = new StringBuilder("{")
 			.append("\"id\": ")			.append(this.id != null? "\"" + this.id + "\"" : null)				.append(", ")
