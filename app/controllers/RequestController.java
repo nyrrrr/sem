@@ -45,11 +45,11 @@ public class RequestController {
 	 * @return eventNodes - A list of all events stored as JsonNode objects.
 	 * @throws IOException
 	 */
-	public static ArrayList<JsonNode> getLocalEvents(String longitude, String latitude, int radius, boolean festivalsOnly) throws IOException {
+	public static ArrayList<JsonNode> getLocalEvents(String latitude, String longitude, int radius, boolean festivalsOnly) throws IOException {
 		ArrayList<JsonNode> eventNodes = new ArrayList<JsonNode>();
 
 		// create parameter for Last.fm query to retrieve local event info
-		String params = LastfmUri.getInstance().getGeoEvents(longitude, latitude, radius, festivalsOnly);
+		String params = LastfmUri.getInstance().getGeoEvents(latitude, longitude, radius, festivalsOnly);
 		JsonNode jsonGeoEvents = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
 		if (jsonGeoEvents.get("error") != null) {
 			eventNodes.add(jsonGeoEvents);
@@ -59,54 +59,61 @@ public class RequestController {
 
 			// iterate through each event, create object and set variables
 			if (jsonGeoEvents != null && jsonGeoEvents.get("event") != null) {
-				for (JsonNode event : jsonGeoEvents.get("event")) {
-					Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
-					e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
+				if(jsonGeoEvents.get("event").getNodeType().name().equals("ARRAY")){
+					jsonGeoEvents = jsonGeoEvents.get("event");
+				}
+				
+				for (JsonNode event : jsonGeoEvents) {
+					if(event.get("id") != null && event.get("title") != null){
+						Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
+						e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
 
-					if (event.get("artists") != null) {
-						for (JsonNode artist : event.get("artists").get("artist")) {
-							Artist a = new Artist(artist.toString().replaceAll("\"", ""));
-							e.addArtist(a);
-						}
-					}
-
-					if (event.get("tags") != null) {
-						for (JsonNode tag : event.get("tags").get("tag")) {
-							e.addTag(tag.toString().replaceAll("\"", ""));
-						}
-					}
-
-					JsonNode jsonVenue = event.get("venue");
-					if (jsonVenue != null) {
-						Venue v = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
-						v.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
-						v.setPhone(jsonVenue.get("phonenumber").toString().replaceAll("\"", ""));
-
-						if (jsonVenue.get("location") != null) {
-							if (jsonVenue.get("location").get("geo:point") != null) {
-								v.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
-								v.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+						if (event.get("artists") != null) {
+							for (JsonNode artist : event.get("artists").get("artist")) {
+								Artist a = new Artist(artist.toString().replaceAll("\"", ""));
+								e.addArtist(a);
 							}
-							v.setCity(jsonVenue.get("location").get("city").toString().replaceAll("\"", ""));
-							v.setCountry(jsonVenue.get("location").get("country").toString().replaceAll("\"", ""));
-							v.setStreet(jsonVenue.get("location").get("street").toString().replaceAll("\"", ""));
-							v.setPostalCode(jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
 						}
 
-						if (event.get("image") != null) {
-							for (JsonNode image : event.get("image")) {
-								if (image.get("size").toString().replaceAll("\"", "").equals("large")) {
-									v.setImg(image.get("#text").toString().replaceAll("\"", ""));
+						if (event.get("tags") != null) {
+							for (JsonNode tag : event.get("tags").get("tag")) {
+								e.addTag(tag.toString().replaceAll("\"", ""));
+							}
+						}
+
+						JsonNode jsonVenue = event.get("venue");
+						if (jsonVenue != null) {
+							Venue v = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
+							v.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
+							v.setPhone(jsonVenue.get("phonenumber").toString().replaceAll("\"", ""));
+
+							if (jsonVenue.get("location") != null) {
+								if (jsonVenue.get("location").get("geo:point") != null) {
+									v.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
+									v.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+								}
+								v.setCity(jsonVenue.get("location").get("city").toString().replaceAll("\"", ""));
+								v.setCountry(jsonVenue.get("location").get("country").toString().replaceAll("\"", ""));
+								v.setStreet(jsonVenue.get("location").get("street").toString().replaceAll("\"", ""));
+								v.setPostalCode(jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
+							}
+
+							if (event.get("image") != null) {
+								for (JsonNode image : event.get("image")) {
+									if (image.get("size").toString().replaceAll("\"", "").equals("large")) {
+										v.setImg(image.get("#text").toString().replaceAll("\"", ""));
+									}
 								}
 							}
+
+							// convert event to JsonNode and store it in eventNodes
+							// list.
+							e.setVenue(v);
+							eventNodes.add(Json.toJson(e));
 						}
 
-						// convert event to JsonNode and store it in eventNodes
-						// list.
-						e.setVenue(v);
-						eventNodes.add(Json.toJson(e));
 					}
-
+					
 				}
 			}
 		}
@@ -424,12 +431,14 @@ public class RequestController {
 
 //		System.out.println(getLocalEvents(null, null, 20, false));
 //		System.out.println(getLocalEvents("49.29180", "8.264116", 20, false));
+//		System.out.println(getLocalEvents("49.4058478", "8.7150993861622", 5, false));
 //		System.out.println(getVenueEvents("8908030", false));
 //		System.out.println(getVenueEvents("8908030", true));
 //		System.out.println(getArtistEvents("Enter Shikari", false).toString());
 //		System.out.println(getArtistEvents("Volbeat", false).toString());
 //		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
-		System.out.println(searchVenue("SAP Arena", "Germany").toString());
+		System.out.println(getArtistEvents("Alesana", false).toString()); // NullPointerException for whatever reason
+//		System.out.println(searchVenue("SAP Arena", "Germany").toString());
 
 		
 		
