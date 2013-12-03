@@ -76,9 +76,7 @@ public class RequestController {
 						}
 					}
 
-					System.out.println(event);
 					JsonNode jsonVenue = event.get("venue");
-					System.out.println(jsonVenue);
 					if (jsonVenue != null) {
 						Venue v = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
 						v.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
@@ -283,10 +281,11 @@ public class RequestController {
 		// create parameter for Last.fm query to retrieve venues
 		String params = LastfmUri.getInstance().getVenueSearch(name, country);
 		JsonNode jsonVenues = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
-		jsonVenues = jsonVenues.get("venuematches");
+		jsonVenues = jsonVenues.get("results");
 
 		// iterate through all matches and extract venue information
-		if (jsonVenues != null) {
+		if (jsonVenues != null && jsonVenues.get("venuematches") != null) {
+			jsonVenues = jsonVenues.get("venuematches");
 			for (JsonNode venue : jsonVenues.get("venue")) {
 				Venue v = new Venue(venue.get("id").toString().replaceAll("\"", ""), venue.get("name").toString().replaceAll("\"", ""));
 				v.setHomepage(venue.get("website").toString().replaceAll("\"", ""));
@@ -347,7 +346,6 @@ public class RequestController {
 		boolean isFirst = true;
 		if (jsonVenueEvents != null && jsonVenueEvents.get("event") != null) {
 			for (JsonNode event : jsonVenueEvents.get("event")) {
-				System.out.println(event);
 				if(event.get("id") != null && event.get("title") != null){
 					// extract event information, store it in Event instance and
 					// add it to the Venue instance
@@ -428,9 +426,10 @@ public class RequestController {
 //		System.out.println(getLocalEvents("49.29180", "8.264116", 20, false));
 //		System.out.println(getVenueEvents("8908030", false));
 //		System.out.println(getVenueEvents("8908030", true));
-		System.out.println(getArtistEvents("Enter Shikari", false).toString());
+//		System.out.println(getArtistEvents("Enter Shikari", false).toString());
 //		System.out.println(getArtistEvents("Volbeat", false).toString());
-		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
+//		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
+		System.out.println(searchVenue("SAP Arena", "Germany").toString());
 
 		
 		
