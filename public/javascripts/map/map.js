@@ -48,7 +48,7 @@ function init() {
 				// geo search
 				var gcontrol = new MQA.GeolocationControl();
 				gcontrol.onLocate = function(poi, position) {
-					sendRequest("", "location", position.coords.latitude, position.coords.longitude, 25);
+					sendRequest("", "location", position.coords.latitude, position.coords.longitude, $('#radius :selected').val());
 				};
 				map.addControl(gcontrol, new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
 				// Map Control options
@@ -140,8 +140,6 @@ function generalStylingAndSetup() {
 		$('.ui-tooltip').hide("fade", "slow");
 		// do not submit form or anything
 		event.preventDefault();
-		// clear map
-		map.removeAllShapes();
 		// handle user input only when a radio button has been selected and we are online!
 		if ($('#query').val() !== "" && $("input[type=radio]:checked").size() > 0 && (MQA.fake === undefined)) {
 			handleUserInput();
@@ -236,6 +234,8 @@ function handleUserInput() {
 }
 
 function sendRequest(query, type, lat, lon, radius) {
+	// clear map
+	map.removeAllShapes();
 	$.ajax({
 		url : "/request",
 		method : "post",
@@ -401,8 +401,9 @@ function createInfoContentHtml(eventObj, data, venue) {
 	// bar
 	infoContentHTML += "<hr/>";
 	// genre
-	
-	if (data.genres.length === 0) data.genres = eventObj.tags;
+
+	if (data.genres.length === 0)
+		data.genres = eventObj.tags;
 	for (var i = 0; i < data.genres.length; i++) {
 		infoContentHTML += "<a href='http://last.fm/tag/" + data.genres[i] + "'>" + data.genres[i] + "</a>";
 		if (i !== data.genres.length - 1)
