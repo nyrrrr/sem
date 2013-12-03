@@ -75,7 +75,9 @@ public class RequestController {
 						}
 					}
 
+					System.out.println(event);
 					JsonNode jsonVenue = event.get("venue");
+					System.out.println(jsonVenue);
 					if (jsonVenue != null) {
 						Venue v = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
 						v.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
@@ -102,6 +104,7 @@ public class RequestController {
 
 						// convert event to JsonNode and store it in eventNodes
 						// list.
+						e.setVenue(v);
 						eventNodes.add(Json.toJson(e));
 					}
 
@@ -175,11 +178,11 @@ public class RequestController {
 
 				// Extract all information from result JsonNode and store them
 				// in respective objects.
-				if (jsonArtistEvents.get("events") != null) {
-					JsonNode events = jsonArtistEvents.get("events").get("event");
+				if (jsonArtistEvents.get("events") != null && jsonArtistEvents.get("events").get("event") != null) {
+					JsonNode events = jsonArtistEvents.get("events");
 					HashMap<String, Event> eventList = new HashMap<String, Event>();
-					if (events != null) {
-						for (JsonNode jEvent : events) {
+					for (JsonNode jEvent : events) {
+						if(jEvent.get("id") != null && jEvent.get("title") != null){
 							Event event = new Event(jEvent.get("id").toString().replaceAll("\"", ""), jEvent.get("title").toString().replaceAll("\"", ""));
 							event.setDate(jEvent.get("startDate").toString().replaceAll("\"", ""));
 							event.setTickets(jEvent.get("website").toString().replaceAll("\"", ""));
@@ -221,7 +224,9 @@ public class RequestController {
 								eventList.put(event.getId(), event);
 							}
 						}
+						
 					}
+
 
 					// Store the all events in artist's object.
 					a.setEvents(eventList);
@@ -337,66 +342,69 @@ public class RequestController {
 		boolean isFirst = true;
 		if (jsonVenueEvents != null && jsonVenueEvents.get("event") != null) {
 			for (JsonNode event : jsonVenueEvents.get("event")) {
-				
-				// extract event information, store it in Event instance and
-				// add it to the Venue instance
-				Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
-				e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
-				e.setTickets(event.get("website").toString().replaceAll("\"", ""));
-				ArrayList<Artist> artists = new ArrayList<Artist>();
-				if (event.get("artists") != null) {
-					for (JsonNode artist : event.get("artists").get("artist")) {
-						Artist a = new Artist(artist.toString().replaceAll("\"", ""));
-						artists.add(a);
-					}
-				}
-				e.setArtists(artists);
-
-				if (event.get("tags") != null) {
-					for (JsonNode tag : event.get("tags").get("tag")) {
-						e.addTag(tag.toString().replaceAll("\"", ""));
-					}
-				}
-
-				
-				// for the first element in the list, extract venue
-				// information (stored in all events, but only needed once)
-				if (isFirst) {
-					isFirst = false; // ensures that this if clause is only
-										// entered once
-
-					// extract venue information and store it in Venue
-					// instance
-					JsonNode jsonVenue = event.get("venue");
-					if (jsonVenue != null) {
-						venue = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
-						venue.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
-						venue.setPhone(jsonVenue.get("phonenumber").toString().replaceAll("\"", ""));
-
-						if (jsonVenue.get("location") != null) {
-							if (jsonVenue.get("location").get("geo:point") != null) {
-								venue.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
-								venue.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
-							}
-							venue.setCity(jsonVenue.get("location").get("city").toString().replaceAll("\"", ""));
-							venue.setCountry(jsonVenue.get("location").get("country").toString().replaceAll("\"", ""));
-							venue.setStreet(jsonVenue.get("location").get("street").toString().replaceAll("\"", ""));
-							venue.setPostalCode(jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
+				System.out.println(event);
+				if(event.get("id") != null && event.get("title") != null){
+					// extract event information, store it in Event instance and
+					// add it to the Venue instance
+					Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
+					e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
+					e.setTickets(event.get("website").toString().replaceAll("\"", ""));
+					ArrayList<Artist> artists = new ArrayList<Artist>();
+					if (event.get("artists") != null) {
+						for (JsonNode artist : event.get("artists").get("artist")) {
+							Artist a = new Artist(artist.toString().replaceAll("\"", ""));
+							artists.add(a);
 						}
+					}
+					e.setArtists(artists);
 
-						// retrieve venue picture link with size 'large'
-						for (JsonNode image : jsonVenue.get("image")) {
-							if (image.get("size").toString().replaceAll("\"", "").equals("large")) {
-								venue.setImg(image.get("#text").toString().replaceAll("\"", ""));
-							}
+					if (event.get("tags") != null) {
+						for (JsonNode tag : event.get("tags").get("tag")) {
+							e.addTag(tag.toString().replaceAll("\"", ""));
 						}
 					}
 
+					
+					// for the first element in the list, extract venue
+					// information (stored in all events, but only needed once)
+					if (isFirst) {
+						isFirst = false; // ensures that this if clause is only
+											// entered once
+
+						// extract venue information and store it in Venue
+						// instance
+						JsonNode jsonVenue = event.get("venue");
+						if (jsonVenue != null) {
+							venue = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
+							venue.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
+							venue.setPhone(jsonVenue.get("phonenumber").toString().replaceAll("\"", ""));
+
+							if (jsonVenue.get("location") != null) {
+								if (jsonVenue.get("location").get("geo:point") != null) {
+									venue.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
+									venue.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+								}
+								venue.setCity(jsonVenue.get("location").get("city").toString().replaceAll("\"", ""));
+								venue.setCountry(jsonVenue.get("location").get("country").toString().replaceAll("\"", ""));
+								venue.setStreet(jsonVenue.get("location").get("street").toString().replaceAll("\"", ""));
+								venue.setPostalCode(jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
+							}
+
+							// retrieve venue picture link with size 'large'
+							for (JsonNode image : jsonVenue.get("image")) {
+								if (image.get("size").toString().replaceAll("\"", "").equals("large")) {
+									venue.setImg(image.get("#text").toString().replaceAll("\"", ""));
+								}
+							}
+						}
+
+					}
+
+					if (venue != null) {
+						venue.addEvent(e);
+					}
 				}
 
-				if (venue != null) {
-					venue.addEvent(e);
-				}
 
 			}
 		}
@@ -411,16 +419,16 @@ public class RequestController {
 
 	public static void main(String[] args) throws IOException {
 
-		 System.out.println(getArtistEvents("Sing um dein Leben", false).toString());
-		// System.out.println(Application.getLocalEvents(null, null, 20,
-		// false));
-		System.out.println(getVenueEvents("8908030", false));
-		// System.out.println(Application.getArtistEvents("Max Herre",
-		// false).toString()); // NullPointerException for whatever reason
-		// System.out.println(Application.getLocalEvents("49.29180", "8.264116",
-		// 20, false));
+//		System.out.println(getLocalEvents(null, null, 20, false));
+//		System.out.println(getLocalEvents("49.29180", "8.264116", 20, false));
+//		System.out.println(getVenueEvents("8908030", false));
 //		System.out.println(getVenueEvents("8908030", true));
+//		System.out.println(getArtistEvents("Enter Shikari", false).toString());
+		System.out.println(getArtistEvents("Volbeat", false).toString());
+//		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
 
+		
+		
 	}
 
 }
