@@ -8,9 +8,9 @@ import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.tdb.store.NodeType;
 
 import models.Artist;
+import models.DBPediaSparqlFactory;
 import models.Event;
 import models.HttpRequestManager;
 import models.LastfmUri;
@@ -23,6 +23,7 @@ public class RequestController {
 	static HttpRequestManager request = HttpRequestManager.getInstance();
 	static SparqlQueryManager sparql = SparqlQueryManager.getInstance();
 	static MusicbrainzSparqlFactory musicbrainz = MusicbrainzSparqlFactory.getInstance();
+	static DBPediaSparqlFactory dbpedia = DBPediaSparqlFactory.getInstance();
 	static LastfmUri lastfm = LastfmUri.getInstance();
 
 	private RequestController() {
@@ -251,19 +252,41 @@ public class RequestController {
 				// info.
 				String query;
 				if (a.getMbid() != null) {
-					query = musicbrainz.getArtistInfoViaMbid(a.getMbid());
+					query = musicbrainz.getArtistDbpediaViaMbid(a.getMbid());
 				} else {
-					query = musicbrainz.getArtistInfo(artist);
+					query = musicbrainz.getArtistDbpedia(artist);
 				}
 
 				// extract info from SPARQL response
-				HashMap<RDFNode, RDFNode> nodes = sparql.sendQuery(MusicbrainzSparqlFactory.ENDPOINT, query);
-				for (RDFNode key : nodes.keySet()) {
-					System.out.println("Key: " + key.toString());
-					System.out.println("Value: " + nodes.get(key).toString());
-					System.out.println("");
+				RDFNode sameAs = sparql.sendMusicbrainzQuery(MusicbrainzSparqlFactory.ENDPOINT, query);
+				if(sameAs != null){
+					query = dbpedia.getArtistInfoViaSameAs(sameAs.toString());
+//					query = dbpedia.getArtistInfo(a.getName());
+				} else {
+					query = dbpedia.getArtistInfo(a.getName());
 				}
-
+				RDFNode[] nodes = sparql.sendDbpediaQuery(DBPediaSparqlFactory.ENDPOINT, query);
+				if(sameAs != null && nodes == null){
+					query = dbpedia.getArtistInfo(a.getName());
+					nodes = sparql.sendDbpediaQuery(DBPediaSparqlFactory.ENDPOINT, query);
+				}
+				
+				if(nodes != null){
+					if(nodes[0] != null){
+						a.setHomepage(nodes[0].toString());
+					}
+					if(nodes[1] != null){
+						String description = nodes[1].toString().replaceAll("@en", "");;
+						a.setDescription(description);
+					}
+					if(nodes[2] != null){
+						a.setCountry(nodes[2].toString());
+					}
+					if(nodes[3] != null){
+						a.setWiki(nodes[3].toString());
+					}
+				}
+				
 				return Json.toJson(a);
 			}
 		}
@@ -439,8 +462,9 @@ public class RequestController {
 //		System.out.println(getLocalEvents("49.4058478", "8.7150993861622", 5, false));
 //		System.out.println(getVenueEvents("8908030", false));
 //		System.out.println(getVenueEvents("8908030", true));
-//		System.out.println(getArtistEvents("Enter Shikari", false).toString());
-		System.out.println(getArtistEvents("Volbeat", false).toString());
+		System.out.println(getArtistEvents("Enter Shikari", false).toString());
+//		System.out.println(getArtistEvents("Volbeat", false).toString());
+//		System.out.println(getArtistEvents("Söhne Mannheims", false).toString());
 //		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
 //		System.out.println(getArtistEvents("Alesana", false).toString()); // NullPointerException for whatever reason
 //		System.out.println(searchVenue("SAP Arena", "Germany").toString());

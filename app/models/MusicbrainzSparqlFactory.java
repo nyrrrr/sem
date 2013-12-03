@@ -1,7 +1,5 @@
 package models;
 
-import java.io.UnsupportedEncodingException;
-
 public class MusicbrainzSparqlFactory {
 
 	public static final String ENDPOINT = "http://dbtune.org/musicbrainz/sparql";
@@ -45,6 +43,8 @@ public class MusicbrainzSparqlFactory {
 		builder.append("\r\n");
 		builder.append("PREFIX mbz: <http://purl.org/ontology/mbz#>");
 		builder.append("\r\n");
+		builder.append("PREFIX artist: <http://musicbrainz.org/artist/>");
+		builder.append("\r\n");
 		
 		PREFIXES = builder.toString();
 		
@@ -57,28 +57,32 @@ public class MusicbrainzSparqlFactory {
 		return instance;
 	}
 	
-	public String getArtistInfo(String artist) throws UnsupportedEncodingException{
+	public String getArtistDbpedia(String artist){
 		return PREFIXES + 
 				"SELECT * WHERE {" + 
-			    " ?s foaf:name \"" + artist + "\"." +
-				" ?s ?p ?o." +
-			    "}";
+			    " ?artist foaf:name \"" + artist + "\"." +
+				" ?artist owl:sameAs ?same." +
+			    " FILTER(REGEX(STR(?same), \"dbpedia.org/resource/\"))" + 
+			    "}" +
+			    "LIMIT 1";
 	}
 	
-	public String getArtistInfoViaMbid(String mbid){
+	public String getArtistDbpediaViaMbid(String mbid){
 		return PREFIXES +
 				"SELECT * WHERE {" + 
-				" ?s mo:musicbrainz <http://musicbrainz.org/artist/" + mbid + ">." + 
-				" ?s ?p ?o." + 
-				"}";
+				" ?artist mo:musicbrainz artist:" + mbid + "." + 
+				" ?artist owl:sameAs ?same." +
+			    " FILTER(REGEX(STR(?same), \"dbpedia.org/resource/\"))" +
+				"}" + 
+			    "LIMIT 1";
 	}
 	
-	public String getResource(String resourceUri){
-		return PREFIXES + 
-				"SELECT * WHERE {" + 
-				" ?s a <" + resourceUri + ">" +
-				" ?s ?p ?o." + 
-				"}";
-	}
+//	public String getResource(String resourceUri){
+//		return PREFIXES + 
+//				"SELECT * WHERE {" + 
+//				" ?s a <" + resourceUri + ">" +
+//				" ?s ?p ?o." + 
+//				"}";
+//	}
 	
 } // End of Class
