@@ -8,6 +8,7 @@ public class Artist {
 	private String mbid;
 	private String lastfm;
 	private String name;
+	private String description;
 	private String img;
 	private String country;
 	private String homepage;
@@ -87,6 +88,14 @@ public class Artist {
 		this.name = name;
 	}
 	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public String getImg() {
 		return img;
 	}
@@ -192,6 +201,7 @@ public class Artist {
 			.append("\"mbid\": ")			.append(this.mbid != null? "\"" + this.mbid + "\"" : null)				.append(", ")
 			.append("\"lastfm\": ")			.append(this.lastfm != null? "\"" + this.lastfm + "\"" : null)			.append(", ")
 			.append("\"name\": ")			.append(this.name != null? "\"" + this.name + "\"" : null)				.append(", ")
+			.append("\"description\"")		.append(this.description != null? "\"" + this.description + "\"" : null).append(", ")
 			.append("\"img\": ")			.append(this.img != null? "\"" + this.img + "\"" : null)				.append(", ")
 			.append("\"country\": ")		.append(this.country != null? "\"" + this.country + "\"" : null)		.append(", ")
 			.append("\"homepage\": ")		.append(this.homepage != null? "\"" + this.homepage + "\"" : null)		.append(", ")

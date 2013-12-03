@@ -172,6 +172,11 @@ public class RequestController {
 						a.addGenre(genre.get("name").toString().replaceAll("\"", ""));
 					}
 				}
+				
+				// get artist summary
+				if(jsonArtistInfo.get("bio") != null && jsonArtistInfo.get("bio").get("summary") != null){
+					a.setDescription(jsonArtistInfo.get("bio").get("summary").toString().replaceAll("\"", ""));
+				}
 
 				// Create parameter for Last.fm query to retrieve all events.
 				// Send request to Last.fm and store response in JsonNode.
@@ -435,9 +440,9 @@ public class RequestController {
 //		System.out.println(getVenueEvents("8908030", false));
 //		System.out.println(getVenueEvents("8908030", true));
 //		System.out.println(getArtistEvents("Enter Shikari", false).toString());
-//		System.out.println(getArtistEvents("Volbeat", false).toString());
+		System.out.println(getArtistEvents("Volbeat", false).toString());
 //		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
-		System.out.println(getArtistEvents("Alesana", false).toString()); // NullPointerException for whatever reason
+//		System.out.println(getArtistEvents("Alesana", false).toString()); // NullPointerException for whatever reason
 //		System.out.println(searchVenue("SAP Arena", "Germany").toString());
 
 		
