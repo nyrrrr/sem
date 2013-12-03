@@ -77,12 +77,4 @@ public class MusicbrainzSparqlFactory {
 			    "LIMIT 1";
 	}
 	
-//	public String getResource(String resourceUri){
-//		return PREFIXES + 
-//				"SELECT * WHERE {" + 
-//				" ?s a <" + resourceUri + ">" +
-//				" ?s ?p ?o." + 
-//				"}";
-//	}
-	
 } // End of Class
