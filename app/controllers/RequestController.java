@@ -8,6 +8,7 @@ import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.tdb.store.NodeType;
 
 import models.Artist;
 import models.Event;
@@ -181,6 +182,10 @@ public class RequestController {
 				if (jsonArtistEvents.get("events") != null && jsonArtistEvents.get("events").get("event") != null) {
 					JsonNode events = jsonArtistEvents.get("events");
 					HashMap<String, Event> eventList = new HashMap<String, Event>();
+					
+					if(events.get("event").getNodeType().name().equals("ARRAY")){
+						events = events.get("event");
+					}
 					for (JsonNode jEvent : events) {
 						if(jEvent.get("id") != null && jEvent.get("title") != null){
 							Event event = new Event(jEvent.get("id").toString().replaceAll("\"", ""), jEvent.get("title").toString().replaceAll("\"", ""));
@@ -423,9 +428,9 @@ public class RequestController {
 //		System.out.println(getLocalEvents("49.29180", "8.264116", 20, false));
 //		System.out.println(getVenueEvents("8908030", false));
 //		System.out.println(getVenueEvents("8908030", true));
-//		System.out.println(getArtistEvents("Enter Shikari", false).toString());
-		System.out.println(getArtistEvents("Volbeat", false).toString());
-//		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
+		System.out.println(getArtistEvents("Enter Shikari", false).toString());
+//		System.out.println(getArtistEvents("Volbeat", false).toString());
+		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
 
 		
 		

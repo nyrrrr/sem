@@ -61,7 +61,7 @@ public class MusicbrainzSparqlFactory {
 		return PREFIXES + 
 				"SELECT * WHERE {" + 
 			    " ?s foaf:name \"" + artist + "\"." +
-				" ?s foaf:member ?o." +
+				" ?s ?p ?o." +
 			    "}";
 	}
 	
