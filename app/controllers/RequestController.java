@@ -266,7 +266,7 @@ public class RequestController {
 					query = dbpedia.getArtistInfo(a.getName());
 				}
 				RDFNode[] nodes = sparql.sendDbpediaQuery(DBPediaSparqlFactory.ENDPOINT, query);
-				if(sameAs != null && nodes == null){
+				if(sameAs != null && nodes[0] == null && nodes[1] == null && nodes[2] == null && nodes[3] == null){
 					query = dbpedia.getArtistInfo(a.getName());
 					nodes = sparql.sendDbpediaQuery(DBPediaSparqlFactory.ENDPOINT, query);
 				}
@@ -462,8 +462,8 @@ public class RequestController {
 //		System.out.println(getLocalEvents("49.4058478", "8.7150993861622", 5, false));
 //		System.out.println(getVenueEvents("8908030", false));
 //		System.out.println(getVenueEvents("8908030", true));
-		System.out.println(getArtistEvents("Enter Shikari", false).toString());
-//		System.out.println(getArtistEvents("Volbeat", false).toString());
+//		System.out.println(getArtistEvents("Enter Shikari", false).toString());
+		System.out.println(getArtistEvents("Volbeat", false).toString());
 //		System.out.println(getArtistEvents("Söhne Mannheims", false).toString());
 //		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
 //		System.out.println(getArtistEvents("Alesana", false).toString()); // NullPointerException for whatever reason
