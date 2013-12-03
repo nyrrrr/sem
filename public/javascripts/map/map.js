@@ -316,11 +316,12 @@ function handleServerResponse(type) {
 			} else {
 				createErrorDialog("<b>ERROR:</b> An unknown error occured.");
 			}
-			map.bestFit();
+			
 		} else {
 			var html = (data.message !== undefined ? data.message : (data[0].message !== undefined ? data[0].message : "An unknown error occured while querying last.fm."));
 			createErrorDialog("<b>Please try again or redefine your query!</b><br/></br>" + html);
 		}
+		map.bestFit();
 	};
 }
 
@@ -453,10 +454,14 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 				once = false;
 				return;
 
-			} else if (data.length === 0)// ignore result
+			} else if (data.length === 0) {// ignore result
+				createErrorDialog("Some results could not be located on the map due to missing geo information.<br/><br/>If there are no results on the map at all, you will have to modify your query.")
 				return;
+			}
 
 			console.log("----- nominatim retrieval successful");
+
+			// TODO alles abgefangen?
 
 			var displayName = data[0].display_name;
 			if ((eventObj.venue.country !== "" && displayName.indexOf(eventObj.venue.country) !== -1) || (eventObj.venue.city !== "" && displayName.indexOf(eventObj.venue.city) !== -1)) {
@@ -474,9 +479,12 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 
 				map.addShapeCollection(pinCollection);
 				once = false;
+			} else {
+				createErrorDialog("Some results could not be located on the map due to missing geo information.<br/><br/>If there are no results on the map at all, you will have to modify your query.")
 			}
 			//poi.setInfoContentHTML(data.display_name);
 			//poi.toggleInfoWindow();
+			map.bestFit();
 		},
 		error : genericErrorMessage()
 	});
