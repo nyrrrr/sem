@@ -4,6 +4,13 @@ body {
 	font: 70% "Trebuchet MS", sans-serif;
 	margin: 0px;
 }
+a {
+	color: rgb(67, 67, 67);
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
 div {
 	margin: 0px;
 	padding: 0px;
@@ -55,6 +62,9 @@ div#overlay.header input#query, div#overlay.header button#submit {
 	float: left;
 	margin-top: 1%;
 	vertical-align: middle;
+}
+div#overlay.header button#submit {
+	margin-top: 1.1%;
 }
 div#overlay select#radius {
 	height: 23px;

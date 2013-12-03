@@ -231,7 +231,7 @@ function sendRequest(query, type, lat, lon, radius) {
 		method : "post",
 		async : true,
 		dataType : "json",
-		timeout : 20000,
+		timeout : 30000,
 		data : {
 			query : query,
 			type : type,
@@ -322,13 +322,14 @@ function addArtistInformationOnMap(data) {
 }
 
 function createInfoContentHtml(eventObj, data, venue) {
-	var infoContentHTML = "<h3>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</h3>";
-	
+	var infoContentHTML = "<h3><a href='http://last.fm/event/" + eventObj.id + "'>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</a></h3><br/>";
+
 	// images
 	infoContentHTML += "<img src='" + data.img + "' alt='artist_pic' />";
-	if (venue.img !== "") infoContentHTML += "<img src='" + venue.img + "' alt='artist_pic' />";
+	if (venue.img !== "")
+		infoContentHTML += "<img src='" + venue.img + "' alt='artist_pic' />";
 	// artists
-	infoContentHTML += "<b>Participants: </b>";
+	infoContentHTML += "<b>Who? </b>";
 	if (eventObj.artists.length > 0) {
 		var i = 1, names = "";
 		$.each(eventObj.artists, function(i, artist) {
@@ -336,20 +337,28 @@ function createInfoContentHtml(eventObj, data, venue) {
 			if (i == 4) {
 				// TODO shorten?
 			}
-			infoContentHTML += artist.name + (i == eventObj.artists.length ? "" : ", ");
+			infoContentHTML += "<a href='http://last.fm/music/" + artist.name + "'>" + artist.name + "</a>" + (i == eventObj.artists.length ? "" : ", ");
 		});
-		infoContentHTML = infoContentHTML.substr(0, infoContentHTML.lastIndexOf(', '));
+		infoContentHTML = infoContentHTML.substr(0, infoContentHTML.lastIndexOf(', ')) + "<br/>";
 	} else {
 		console.log(data.name);
-		infoContentHTML += data.name;
+		infoContentHTML += "<a href='" + data.lastfm + "'>" + data.name + "</a><br/>";
 	}
+	// date
+	infoContentHTML += "<b>When?</b> " + eventObj.date + "<br/><br/>"
 	// address
-	
+	infoContentHTML += "<b>Where?</b> ";
+	if (venue.name !== "")
+		infoContentHTML += "<a href='http://last.fm/venue/" + venue.id + "'>" + venue.name + "</a><br/>";
+
+	// tel / homepage
+
 	// bar
 	infoContentHTML += "<hr/>";
-	
+	// genre
+
 	// tickets
-	
+
 	// more details
 
 	return infoContentHTML;
