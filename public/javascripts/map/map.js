@@ -171,7 +171,17 @@ function generalStylingAndSetup() {
 		at : "bottom center",
 		of : $('#type label[for="location"]')
 	});
-	;
+
+	// // images
+	// $('img').on({
+	// hover : function() {
+	// $(this).css({
+	// height: $(this).position().top,
+	// width : $(this).position().left
+	// });
+	// }
+	// });
+
 }
 
 // resize map to screen width
@@ -280,9 +290,28 @@ function handleServerResponse(type) {
 			console.log("----- request response retrieved for: " + type);
 			pinCollection = new MQA.ShapeCollection();
 			if (type === "artist") {
+				if (data.events === undefined || jQuery.isEmptyObject(data.events))
+					createErrorDialog("<b>It occurs as if the artist is not on tour.</b><br/><br/>Please try another search term.");
 				addArtistInformationOnMap(data);
 			} else if (type === "location") {
-				console.log(data);
+				var info, artist;
+				$.each(data, function(i, obj) {
+					info = createPOI("info", obj.venue.latitude, obj.venue.longitude);
+
+					artist = (obj.artists.length >= 1 ? obj.artists[0] : {
+						name : obj.title,
+						lastfm : "http://last.fm/event/" + obj.id,
+						genres : []
+					})
+					infoContentHTML = createInfoContentHtml(obj, artist, obj.venue);
+
+					info.setInfoContentHTML(infoContentHTML);
+					infoContentHTML = "";
+					info.setDeclutterMode(true);
+					pinCollection.add(info);
+				});
+
+				map.addShapeCollection(pinCollection);
 			} else if (type === "venue") {
 			} else {
 				createErrorDialog("<b>ERROR:</b> An unknown error occured.");
@@ -322,14 +351,15 @@ function addArtistInformationOnMap(data) {
 }
 
 function createInfoContentHtml(eventObj, data, venue) {
-	var infoContentHTML = "<h3><a href='http://last.fm/event/" + eventObj.id + "'>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</a></h3><br/>";
+	var infoContentHTML = "<h3><a href='http://last.fm/event/" + eventObj.id + "'>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</a></h3>";
 
 	// images
-	infoContentHTML += "<img src='" + data.img + "' alt='artist_pic' />";
+	if (data.img !== "" && data.img !== undefined && data.img !== null)
+		infoContentHTML += "<div class='img'><img src='" + data.img + "' alt='artist_pic' /><br/></div>";
 	if (venue.img !== "")
-		infoContentHTML += "<img src='" + venue.img + "' alt='artist_pic' />";
+		infoContentHTML += "<div class='img'><img src='" + venue.img + "' alt='venue_pic' /></div>";
 	// artists
-	infoContentHTML += "<b>Who? </b>";
+	infoContentHTML += "<b>Who?</b> <br/>";
 	if (eventObj.artists.length > 0) {
 		var i = 1, names = "";
 		$.each(eventObj.artists, function(i, artist) {
@@ -341,24 +371,43 @@ function createInfoContentHtml(eventObj, data, venue) {
 		});
 		infoContentHTML = infoContentHTML.substr(0, infoContentHTML.lastIndexOf(', ')) + "<br/>";
 	} else {
-		console.log(data.name);
 		infoContentHTML += "<a href='" + data.lastfm + "'>" + data.name + "</a><br/>";
 	}
+	if (data.description !== "" && data.description !== undefined && data.description !== null) {
+		var description = data.description.replace("\t", "").replace("\n", "").replace("\\n", "").replace("\\", "").replace("\n", "").replace("\\n", "").replace(/Read more about .* on last.fm/, "");
+		infoContentHTML += "<br/><div class='description'>" + description + "</div>"
+	};
+
 	// date
-	infoContentHTML += "<b>When?</b> " + eventObj.date + "<br/><br/>"
+	infoContentHTML += "<br/><b>When?</b><br/> " + eventObj.date + "<br/><br/>"
 	// address
-	infoContentHTML += "<b>Where?</b> ";
+	infoContentHTML += "<b>Where?</b> <br/>";
 	if (venue.name !== "")
 		infoContentHTML += "<a href='http://last.fm/venue/" + venue.id + "'>" + venue.name + "</a><br/>";
-
+	if (venue.street !== "")
+		infoContentHTML += venue.street + "<br/>";
+	if (venue.postalCode !== "")
+		infoContentHTML += venue.postalCode + " ";
+	if (venue.city !== "")
+		infoContentHTML += venue.city + "<br/>";
+	if (venue.country !== "")
+		infoContentHTML += venue.country + "<br/>";
 	// tel / homepage
-
+	if (venue.homepage !== "")
+		infoContentHTML += "<br/><b>Web:</b> <a href='" + venue.homepage + "'>" + venue.homepage + "</a>";
+	// tickets
+	if (eventObj.tickets !== "")
+		infoContentHTML += "<br/><b>Tickets</b> <a href='" + eventObj.tickets + "'>" + eventObj.tickets + "</a>";
 	// bar
 	infoContentHTML += "<hr/>";
 	// genre
-
-	// tickets
-
+	
+	if (data.genres.length === 0) data.genres = eventObj.tags;
+	for (var i = 0; i < data.genres.length; i++) {
+		infoContentHTML += "<a href='http://last.fm/tag/" + data.genres[i] + "'>" + data.genres[i] + "</a>";
+		if (i !== data.genres.length - 1)
+			infoContentHTML += ", ";
+	}
 	// more details
 
 	return infoContentHTML;
