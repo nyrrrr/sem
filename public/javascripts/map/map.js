@@ -49,6 +49,7 @@ function init() {
 				var gcontrol = new MQA.GeolocationControl();
 				gcontrol.onLocate = function(poi, position) {
 					sendRequest("", "location", position.coords.latitude, position.coords.longitude, $('#radius :selected').val());
+					map.addShape(poi); // TODO shape
 				};
 				map.addControl(gcontrol, new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
 				// Map Control options
@@ -375,7 +376,7 @@ function createInfoContentHtml(eventObj, data, venue) {
 		infoContentHTML += "<a href='" + data.lastfm + "'>" + data.name + "</a><br/>";
 	}
 	if (data.description !== "" && data.description !== undefined && data.description !== null) {
-		var description = data.description.replace("\t", "").replace("\n", "").replace("\\n", "").replace("\\", "").replace("\n", "").replace("\\n", "").replace(/Read more about .* on last.fm/, "");
+		var description = data.description.substr(0, data.description.lastIndexOf('<a')).replace(/(\n|\\n)/g, "<br/>").replace(/\t/g, "");
 		infoContentHTML += "<br/><div class='description'>" + description + "</div>"
 	};
 
@@ -397,7 +398,7 @@ function createInfoContentHtml(eventObj, data, venue) {
 	if (venue.homepage !== "")
 		infoContentHTML += "<br/><b>Web:</b> <a href='" + venue.homepage + "'>" + venue.homepage + "</a>";
 	// tickets
-	if (eventObj.tickets !== "")
+	if (eventObj.tickets !== "" && eventObj.tickets !== undefined && eventObj.tickets !== null)
 		infoContentHTML += "<br/><b>Tickets</b> <a href='" + eventObj.tickets + "'>" + eventObj.tickets + "</a>";
 	// bar
 	infoContentHTML += "<hr/>";
