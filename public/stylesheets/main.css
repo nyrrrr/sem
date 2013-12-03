@@ -133,9 +133,18 @@ div#overlay button#submit {
 	padding: 1%;
 	text-align: center;
 }
-div.mqabasicwnd {
+div.mqabasicwnd, div.mqabasicwnd-content {
 	font: 12px arial, helvetica, sans-serif;
 	width: 450px !important;
+	height: auto !important;
+}
+div.mqabasicwnd img {
+	width: 90px;
+	overflow:scroll;
+	float: right;
+}
+div.mqabasicwnd hr {
+	color: gray;
 }
 .center {
 	position: relative;

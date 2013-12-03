@@ -249,6 +249,7 @@ function sendRequest(query, type, lat, lon, radius) {
 		}
 	});
 }
+
 function getGeoLocation(query, lat, lon, radius, callback) {
 	$.ajax({
 		url : 'http://open.mapquestapi.com/nominatim/v1/search/' + query + '?format=json&addressdetails=1',
@@ -265,11 +266,13 @@ function getGeoLocation(query, lat, lon, radius, callback) {
 		error : genericErrorMessage()
 	});
 }
+
 function genericErrorMessage() {
 	return function(xhr, status, errorThrown) {
 		createErrorDialog("<b>ERROR:</b> " + status + "<br/>" + errorThrown);
 	};
 }
+
 function handleServerResponse(type) {
 	return function(data, textStatus, jqXHR) {
 		if (data.error === undefined && (data[0] !== undefined ? data[0].error === undefined : true)) {
@@ -302,18 +305,54 @@ function addArtistInformationOnMap(data) {
 			nominatimBackUpQuery(eventObj, data);
 			return;
 		}
-		//info.setRolloverContent('ROLLOVER');
 		// TODO infoWindow
-		infoContentHTML += "<h4>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</h4>";
+
+		// title
+		infoContentHTML = createInfoContentHtml(eventObj, data, venue);
 
 		if (!info)
 			return;
 
 		info.setInfoContentHTML(infoContentHTML);
+		infoContentHTML = "";
 		info.setDeclutterMode(true);
 		pinCollection.add(info);
 	});
 	map.addShapeCollection(pinCollection);
+}
+
+function createInfoContentHtml(eventObj, data, venue) {
+	var infoContentHTML = "<h3>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</h3>";
+	
+	// images
+	infoContentHTML += "<img src='" + data.img + "' alt='artist_pic' />";
+	if (venue.img !== "") infoContentHTML += "<img src='" + venue.img + "' alt='artist_pic' />";
+	// artists
+	infoContentHTML += "<b>Participants: </b>";
+	if (eventObj.artists.length > 0) {
+		var i = 1, names = "";
+		$.each(eventObj.artists, function(i, artist) {
+			i++;
+			if (i == 4) {
+				// TODO shorten?
+			}
+			infoContentHTML += artist.name + (i == eventObj.artists.length ? "" : ", ");
+		});
+		infoContentHTML = infoContentHTML.substr(0, infoContentHTML.lastIndexOf(', '));
+	} else {
+		console.log(data.name);
+		infoContentHTML += data.name;
+	}
+	// address
+	
+	// bar
+	infoContentHTML += "<hr/>";
+	
+	// tickets
+	
+	// more details
+
+	return infoContentHTML;
 }
 
 // perform nominatim query when not enough geo info is provided
@@ -358,15 +397,16 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 			} else if (data.length === 0)// ignore result
 				return;
 
-			// TODO infoWindow
 			console.log("----- nominatim retrieval successful");
+
 			var displayName = data[0].display_name;
-			console.log(data, once);
 			if ((eventObj.venue.country !== "" && displayName.indexOf(eventObj.venue.country) !== -1) || (eventObj.venue.city !== "" && displayName.indexOf(eventObj.venue.city) !== -1)) {
 				info = createPOI("info", data[0].lat, data[0].lon);
+				// TODO infoWindow
 
-				var infoContentHTML = "<h4>" + eventObj.title + (((eventObj.title == pData.name) && (eventObj.venue.name !== "")) ? " in " + eventObj.venue.name : " in " + ((displayName.indexOf(',') !== -1) ? (displayName.substr(0, displayName.indexOf(',')) === "undefined" ? (displayName.substr(11, displayName.substr(11).indexOf(',')) !== "undefined" ? displayName.substr(11, displayName.substr(11).indexOf(',')) : "") : "") : displayName)
-				) + "</h4>";
+				var infoContentHTML = createInfoContentHtml(eventObj, pData, eventObj.venue);
+				//= "<h4>" + eventObj.title + (((eventObj.title == pData.name) && (eventObj.venue.name !== "")) ? " in " + eventObj.venue.name : " in " + ((displayName.indexOf(',') !== -1) ? (displayName.substr(0, displayName.indexOf(',')) === "undefined" ? (displayName.substr(11, displayName.substr(11).indexOf(',')) !== "undefined" ? displayName.substr(11, displayName.substr(11).indexOf(',')) : "") : "") : displayName)
+				//) + "</h4>";
 				infoContentHTML += "";
 
 				info.setInfoContentHTML(infoContentHTML);
