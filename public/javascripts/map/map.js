@@ -416,7 +416,7 @@ function createInfoContentHtml(eventObj, data, venue, isRollOverText) {
 		infoContentHTML += "<br/><b>Web:</b> <a href='" + (venue.homepage ? venue.homepage + "'>" + venue.homepage + "</a>" + (data.homepage ? ", <a href='" + data.homepage + "'>" + data.homepage + "</a>" : "") : data.homepage + "'>" + data.homepage + "</a>");
 	// tickets
 	if (eventObj.tickets)
-		infoContentHTML += "<br/><b>Tickets;</b> <a href='" + eventObj.tickets + "'>" + eventObj.tickets + "</a>";
+		infoContentHTML += "<br/><b>Tickets:</b> <a href='" + eventObj.tickets + "'>" + (eventObj.tickets.length > 55 ? eventObj.tickets.substr(0, 55) + "..." : eventObj.tickets) + "</a>";
 	// bar
 	infoContentHTML += "<hr/>";
 	// genre
