@@ -49,7 +49,8 @@ function init() {
 				var gcontrol = new MQA.GeolocationControl();
 				gcontrol.onLocate = function(poi, position) {
 					sendRequest("", "location", position.coords.latitude, position.coords.longitude, $('#radius :selected').val());
-					map.addShape(poi); // TODO shape
+					map.addShape(poi);
+					// TODO shape
 				};
 				map.addControl(gcontrol, new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
 				// Map Control options
@@ -304,8 +305,9 @@ function handleServerResponse(type) {
 						lastfm : "http://last.fm/event/" + obj.id,
 						genres : []
 					})
-					infoContentHTML = createInfoContentHtml(obj, artist, obj.venue);
+					infoContentHTML = createInfoContentHtml(obj, artist, obj.venue, false);
 
+					info.setRolloverContent(createInfoContentHtml(obj, artist, obj.venue, true));
 					info.setInfoContentHTML(infoContentHTML);
 					infoContentHTML = "";
 					info.setDeclutterMode(true);
@@ -317,7 +319,7 @@ function handleServerResponse(type) {
 			} else {
 				createErrorDialog("<b>ERROR:</b> An unknown error occured.");
 			}
-			
+
 		} else {
 			var html = (data.message !== undefined ? data.message : (data[0].message !== undefined ? data[0].message : "An unknown error occured while querying last.fm."));
 			createErrorDialog("<b>Please try again or redefine your query!</b><br/></br>" + html);
@@ -339,11 +341,12 @@ function addArtistInformationOnMap(data) {
 		// TODO infoWindow
 
 		// title
-		infoContentHTML = createInfoContentHtml(eventObj, data, venue);
+		infoContentHTML = createInfoContentHtml(eventObj, data, venue, false);
 
 		if (!info)
 			return;
 
+		info.setRolloverContent(createInfoContentHtml(eventObj, data, venue, true));
 		info.setInfoContentHTML(infoContentHTML);
 		infoContentHTML = "";
 		info.setDeclutterMode(true);
@@ -352,54 +355,59 @@ function addArtistInformationOnMap(data) {
 	map.addShapeCollection(pinCollection);
 }
 
-function createInfoContentHtml(eventObj, data, venue) {
+function createInfoContentHtml(eventObj, data, venue, isRollOverText) {
 	var infoContentHTML = "<h3><a href='http://last.fm/event/" + eventObj.id + "'>" + eventObj.title + (eventObj.title == data.name && venue.name !== "" ? " in " + venue.name : "") + "</a></h3>";
 
 	// images
-	if (data.img !== "" && data.img !== undefined && data.img !== null)
-		infoContentHTML += "<div class='img'><img src='" + data.img + "' alt='artist_pic' /><br/></div>";
-	if (venue.img !== "")
+	if (data.img)
+		infoContentHTML += "<div class='img'><img src='" + data.img + "' alt='artist_pic' /></div>";
+	if (venue.img)
 		infoContentHTML += "<div class='img'><img src='" + venue.img + "' alt='venue_pic' /></div>";
 	// artists
-	infoContentHTML += "<b>Who?</b> <br/>";
-	if (eventObj.artists.length > 0) {
-		var i = 1, names = "";
-		$.each(eventObj.artists, function(i, artist) {
-			i++;
-			if (i == 4) {
-				// TODO shorten?
-			}
-			infoContentHTML += "<a href='http://last.fm/music/" + artist.name + "'>" + artist.name + "</a>" + (i == eventObj.artists.length ? "" : ", ");
-		});
-		infoContentHTML = infoContentHTML.substr(0, infoContentHTML.lastIndexOf(', ')) + "<br/>";
-	} else {
-		infoContentHTML += "<a href='" + data.lastfm + "'>" + data.name + "</a><br/>";
+	if (isRollOverText === false) {
+		infoContentHTML += "<br/><b>Who?</b> <br/>";
+		if (eventObj.artists.length > 0) {
+			var i = 1, names = "";
+			$.each(eventObj.artists, function(i, artist) {
+				i++;
+				if (i == 4) {
+					// TODO shorten?
+				}
+				infoContentHTML += "<a href='http://last.fm/music/" + artist.name + "'>" + artist.name + "</a>" + (i == eventObj.artists.length ? "" : ", ");
+			});
+			infoContentHTML = infoContentHTML.substr(0, infoContentHTML.lastIndexOf(', ')) + "<br/>";
+		} else {
+			infoContentHTML += "<a href='" + data.lastfm + "'>" + data.name + "</a><br/>";
+		}
+		if (data.description) {
+			//var description = data.description.substr(0, data.description.lastIndexOf('<a')).replace(/(\n|\\n)/g, "<br/>").replace(/\t/g, "");
+			var description = data.description.replace(/(\n|\\n)/g, "<br/>").replace(/\t/g, "");
+			infoContentHTML += "<br/><div class='description'>" + description + "</div>"
+		};
+		// wiki link
+		if (data.wiki)
+			infoContentHTML += "<a href='" + data.wiki + "' class='moreLink'>more info</a><br/>";
 	}
-	if (data.description !== "" && data.description !== undefined && data.description !== null) {
-		var description = data.description.substr(0, data.description.lastIndexOf('<a')).replace(/(\n|\\n)/g, "<br/>").replace(/\t/g, "");
-		infoContentHTML += "<br/><div class='description'>" + description + "</div>"
-	};
-
 	// date
 	infoContentHTML += "<br/><b>When?</b><br/> " + eventObj.date + "<br/><br/>"
 	// address
 	infoContentHTML += "<b>Where?</b> <br/>";
-	if (venue.name !== "")
+	if (venue.name)
 		infoContentHTML += "<a href='http://last.fm/venue/" + venue.id + "'>" + venue.name + "</a><br/>";
-	if (venue.street !== "")
+	if (venue.street)
 		infoContentHTML += venue.street + "<br/>";
-	if (venue.postalCode !== "")
+	if (venue.postalCode)
 		infoContentHTML += venue.postalCode + " ";
-	if (venue.city !== "")
+	if (venue.city)
 		infoContentHTML += venue.city + "<br/>";
-	if (venue.country !== "")
+	if (venue.country)
 		infoContentHTML += venue.country + "<br/>";
 	// tel / homepage
-	if (venue.homepage !== "")
-		infoContentHTML += "<br/><b>Web:</b> <a href='" + venue.homepage + "'>" + venue.homepage + "</a>";
+	if (venue.homepage || data.homepage)
+		infoContentHTML += "<br/><b>Web:</b> <a href='" + (venue.homepage ? venue.homepage + "'>" + venue.homepage + "</a>" + (data.homepage ? ", <a href='" + data.homepage +"'>" + data.homepage + "</a>" : "") : data.homepage + "'>" + data.homepage + "</a>");
 	// tickets
-	if (eventObj.tickets !== "" && eventObj.tickets !== undefined && eventObj.tickets !== null)
-		infoContentHTML += "<br/><b>Tickets</b> <a href='" + eventObj.tickets + "'>" + eventObj.tickets + "</a>";
+	if (eventObj.tickets)
+		infoContentHTML += "<br/><b>Tickets;</b> <a href='" + eventObj.tickets + "'>" + eventObj.tickets + "</a>";
 	// bar
 	infoContentHTML += "<hr/>";
 	// genre
@@ -469,11 +477,12 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 				info = createPOI("info", data[0].lat, data[0].lon);
 				// TODO infoWindow
 
-				var infoContentHTML = createInfoContentHtml(eventObj, pData, eventObj.venue);
+				var infoContentHTML = createInfoContentHtml(eventObj, pData, eventObj.venue, false);
 				//= "<h4>" + eventObj.title + (((eventObj.title == pData.name) && (eventObj.venue.name !== "")) ? " in " + eventObj.venue.name : " in " + ((displayName.indexOf(',') !== -1) ? (displayName.substr(0, displayName.indexOf(',')) === "undefined" ? (displayName.substr(11, displayName.substr(11).indexOf(',')) !== "undefined" ? displayName.substr(11, displayName.substr(11).indexOf(',')) : "") : "") : displayName)
 				//) + "</h4>";
 				infoContentHTML += "";
 
+				info.setRolloverContent(createInfoContentHtml(eventObj, pData, eventObj.venue, true));
 				info.setInfoContentHTML(infoContentHTML);
 				info.setDeclutterMode(true);
 				pinCollection.add(info);

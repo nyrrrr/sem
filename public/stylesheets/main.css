@@ -209,6 +209,10 @@ div.mqabasicwnd hr {
 	background: #cd0a0a url(images/ui-bg_glass_95_fef1ec_1x400.png) 50% 50% repeat-x;
 	color: #ffffff;
 }
+.moreLink {
+	text-decoration: underline;
+}
+
 /* MAPQUEST STUFF */
 
 /* information window stuff*/
