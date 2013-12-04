@@ -153,6 +153,11 @@ div.mqabasicwnd, div.mqabasicwnd-content {
 	width: 450px !important;
 	height: auto !important;
 }
+div.mqabasicwnd .img {
+	float:right;
+	width: 90px !important;
+	height: 60px !important;	
+}
 div.mqabasicwnd img {
 	max-width: 90px;
 	max-height: 60px;
@@ -180,13 +185,15 @@ div.mqabasicwnd img:hover {
 	-webkit-box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 	box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 	z-index: 5000 !important;
-	transform : scale(1.25);
+	transform : scale(2);
+	margin-right : 45px;
+	margin-top: 30px;
 	transition-timing-function: ease-out;
 	transition-duration: 500ms;
-	-ms-transform: scale(1.25);
+	-ms-transform: scale(2);
 	-ms-transition-timing-function: ease-out;
 	-ms-transition-duration: 500ms;
-	-webkit-transform: scale(1.25);
+	-webkit-transform: scale(2);
 	-webkit-transition-timing-function: ease-out;
 	-webkit-transition-duration: 500ms;
 }

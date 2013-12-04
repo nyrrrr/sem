@@ -404,7 +404,7 @@ function createInfoContentHtml(eventObj, data, venue, isRollOverText) {
 		infoContentHTML += venue.country + "<br/>";
 	// tel / homepage
 	if (venue.homepage || data.homepage)
-		infoContentHTML += "<br/><b>Web:</b> <a href='" + (venue.homepage ? venue.homepage + "'>" + venue.homepage + "</a>" + (data.homepage ? ", <a href='" + data.homepage +"'>" + data.homepage + "</a>" : "") : data.homepage + "'>" + data.homepage + "</a>");
+		infoContentHTML += "<br/><b>Web:</b> <a href='" + (venue.homepage ? venue.homepage + "'>" + venue.homepage + "</a>" + (data.homepage ? ", <a href='" + data.homepage + "'>" + data.homepage + "</a>" : "") : data.homepage + "'>" + data.homepage + "</a>");
 	// tickets
 	if (eventObj.tickets)
 		infoContentHTML += "<br/><b>Tickets;</b> <a href='" + eventObj.tickets + "'>" + eventObj.tickets + "</a>";
@@ -456,7 +456,10 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 					console.log("----- retry nominatim request with modified query");
 					var retry = nomQuery.substr(nomQuery.indexOf(',') + 1);
 					retry = url.replace(nomQuery, retry);
-
+					console.log("debug# nominatim query:");
+					console.log(nomQuery);
+					console.log(url);
+					console.log("debug# Event object:");
 					nominatimRequest(retry, "", eventObj, pData, true);
 					return;
 				}
@@ -464,6 +467,11 @@ function nominatimRequest(url, nomQuery, eventObj, pData, once) {
 				return;
 
 			} else if (data.length === 0) {// ignore result
+				console.log("debug# nominatim query:");
+				console.log(nomQuery);
+				console.log(url);
+				console.log("debug# Event object:");
+				console.log(eventObj);
 				createErrorDialog("Some results could not be located on the map due to missing geo information.<br/><br/>If there are no results on the map at all, you will have to modify your query.")
 				return;
 			}
