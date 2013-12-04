@@ -6,6 +6,15 @@ jQuery.fn.center = function() {
 	return this;
 }
 var map;
+// page load animation
+$(document).on({
+	ajaxStart : function() {
+		$('body').addClass("loading");
+	},
+	ajaxStop : function() {
+		$('body').removeClass("loading");
+	}
+});
 // on page ready
 $(function() {
 	// TODO here needs to be some function that helps to start the application in query mode when someone adds a parameter to the URL

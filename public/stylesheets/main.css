@@ -154,9 +154,9 @@ div.mqabasicwnd, div.mqabasicwnd-content {
 	height: auto !important;
 }
 div.mqabasicwnd .img {
-	float:right;
+	float: right;
 	width: 90px !important;
-	height: 60px !important;	
+	height: 60px !important;
 }
 div.mqabasicwnd img {
 	max-width: 90px;
@@ -166,7 +166,7 @@ div.mqabasicwnd img {
 	overflow: scroll;
 	float: right;
 	z-index: 1;
-	transform : scale(1);
+	transform: scale(1);
 	transition-timing-function: ease-out;
 	transition-duration: 500ms;
 	-ms-transform: scale(1);
@@ -185,8 +185,8 @@ div.mqabasicwnd img:hover {
 	-webkit-box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 	box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 	z-index: 5000 !important;
-	transform : scale(2);
-	margin-right : 45px;
+	transform: scale(2);
+	margin-right: 45px;
 	margin-top: 30px;
 	transition-timing-function: ease-out;
 	transition-duration: 500ms;
@@ -219,7 +219,23 @@ div.mqabasicwnd hr {
 .moreLink {
 	text-decoration: underline;
 }
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	background: rgba( 255, 255, 255, .8 ) url('/assets/images/ajax-loader.gif') 50% 50% no-repeat;
+}
+body.loading {
+	overflow: hidden;
+}
 
+body.loading .modal {
+	display: block;
+}
 /* MAPQUEST STUFF */
 
 /* information window stuff*/
