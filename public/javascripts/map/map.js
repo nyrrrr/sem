@@ -322,13 +322,42 @@ function handleServerResponse(type) {
 					info.setDeclutterMode(true);
 					pinCollection.add(info);
 				});
-
 				map.addShapeCollection(pinCollection);
 			} else if (type === "venue") {
+				// TODO
+			} else if (type === "venueSearch") {
+				var html = "";
+				// TODO display box
+				$.each(data, function(key, json) {
+					html += "<input type='checkbox' name='venue'/>" + json.name + (json.city !== "" ? " " + json.city : "") + (json.country !== "" ? " " + json.country : "") + "<br/>";
+				});
+				$("#error-panel").html(html).dialog({
+					modal : true,
+					height : 300,
+					width : 350,
+					buttons : [{
+						text : "Ok",
+						click : function() {
+							$(this).dialog("close");
+							sendRequest($('#error-panel input:checkbox:checked').val(), "venue", "", "", 25);
+						}
+					}, {
+						text : "Cancel",
+						click : function() {
+							$(this).dialog("close");
+						}
+					}]
+				}).css("z-index", "999999").find("input:checkbox").click(function() {
+					if ($(this).is(":checked")) {
+						var group = "input:checkbox[name='" + $(this).attr("name") + "']";
+						$(group).prop("checked", false);
+						$(this).prop("checked", true);
+					} else {$(this).prop("checked", true);}
+				}).first().prop("checked", true);
+				;
 			} else {
 				createErrorDialog("<b>ERROR:</b> An unknown error occured.");
 			}
-
 		} else {
 			var html = (data.message !== undefined ? data.message : (data[0].message !== undefined ? data[0].message : "An unknown error occured while querying last.fm."));
 			createErrorDialog("<b>Please try again or redefine your query!</b><br/></br>" + html);

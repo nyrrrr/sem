@@ -1,22 +1,18 @@
 @(message: String, requestForm: Form[Request])
-
 @import helper._
-
 @main("Welcome to SEM", message) {
 <div id="container">
 	<div id='dpanel'></div>
 	<div id="overlay" class="shadow center ui-corner-all">
 		<input id="query" type="text" name="query" class="text ui-widget-content ui-corner-all" value="" placeholder="Enter name of artist or location or venue here..." title="e.g. Volbeat, Lady Gaga, Mannheim, Germany" />
-		</input>
 		<div id="type" class="ui-widget">
 			<input type="radio" id="artist" name="type" value="artist">
 			<label for="artist" title="With this option all the events performed by a certain artists will be displayed">Artist</label>
 			<input type="radio" id="location" name="type" value="location">
 			<label for="location" title="In radius mode this will show you all the events next to location you enter">Location</label>
-			<!-- <input type="radio" id="venue" name="type" value="venue">
-			<label for="venue" title="This will return all the events taking place in the entered venue.">Venue</label> -->
+			<input type="radio" id="venue" name="type" value="venueSearch">
+			<label for="venue" title="This will return all the events taking place in the entered venue.">Venue</label>
 		</div>
-
 		<select id="radius">
 			<option value="5">5km</option>
 			<option value="10">10km</option>
@@ -24,11 +20,9 @@
 			<option value="50">50km</option>
 			<option value="100">100km</option>
 		</select>
-
 		<button id="submit" class="ui-state-default ui-corner-all ui-state-hover" title="Start search!">
 			<span class=" ui-icon ui-icon-play" title="Start search!"> OK </span>
 		</button>
-
 	</div>
 	<div id='map' style='width:800; height:500px;'></div>
 </div>

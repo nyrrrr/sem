@@ -99,7 +99,7 @@ public class LastfmUri {
 	 */
 	public String getVenueSearch(String venue, String country) throws UnsupportedEncodingException{
 		venue = URLEncoder.encode(venue, "UTF-8");
-		country = URLEncoder.encode(country, "UTF-8");
+		if(country != null) country = URLEncoder.encode(country, "UTF-8");
 		
 		StringBuilder uri = new StringBuilder(100);
 		uri.append(lastfmURI(VENUE, METHOD_VENUE_SEARCH, venue, false));
@@ -107,6 +107,7 @@ public class LastfmUri {
 			uri.append("&country=");
 			uri.append(country);
 		}
+		uri.append("&limit=5");
 		
 		return uri.toString();
 	}
