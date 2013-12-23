@@ -58,8 +58,10 @@ function init() {
 				var gcontrol = new MQA.GeolocationControl();
 				gcontrol.onLocate = function(poi, position) {
 					sendRequest("", "location", position.coords.latitude, position.coords.longitude, $('#radius :selected').val());
-					map.addShape(poi);
-					// TODO shape
+					var point = new MQA.Poi( {lat: position.coords.latitude, lng: position.coords.longitude} );
+					var icon = new MQA.Icon("http://content.mqcdn.com/open-sdk/js/v7.0.1/images/waving_man_sm.png", 20, 29);
+					point.setIcon(icon);
+					map.addShape(point);			
 				};
 				map.addControl(gcontrol, new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
 				// Map Control options
@@ -357,7 +359,8 @@ function handleServerResponse(type) {
 						text : "Ok",
 						click : function() {
 							$(this).dialog("close");
-							sendRequest($('#error-panel input:checkbox:checked').val(), "venue", "", "", 25, $('#error-panel input:checkbox:checked').attr('id')); // venue id
+							sendRequest($('#error-panel input:checkbox:checked').val(), "venue", "", "", 25, $('#error-panel input:checkbox:checked').attr('id'));
+							// venue id
 						}
 					}, {
 						text : "Cancel",
@@ -370,7 +373,9 @@ function handleServerResponse(type) {
 						var group = "input:checkbox[name='" + $(this).attr("name") + "']";
 						$(group).prop("checked", false);
 						$(this).prop("checked", true);
-					} else {$(this).prop("checked", true);}
+					} else {
+						$(this).prop("checked", true);
+					}
 				}).first().prop("checked", true);
 				;
 			} else {
