@@ -244,7 +244,7 @@ function handleUserInput() {
 		getGeoLocation(query, lat, lon, radius, sendRequest);
 }
 
-function sendRequest(query, type, lat, lon, radius) {
+function sendRequest(query, type, lat, lon, radius, venue) {
 	// clear map
 	map.removeAllShapes();
 	$.ajax({
@@ -258,7 +258,8 @@ function sendRequest(query, type, lat, lon, radius) {
 			type : type,
 			lat : lat,
 			lon : lon,
-			radius : radius
+			radius : radius,
+			venue : venue
 		},
 		before : function() {
 			$("body").css("cursor", "progress");
@@ -325,11 +326,28 @@ function handleServerResponse(type) {
 				map.addShapeCollection(pinCollection);
 			} else if (type === "venue") {
 				// TODO
+				var info, artist;
+				$.each(data.events, function(i, eventObj) {
+					info = createPOI("info", data.latitude, data.longitude);
+
+					artist = (eventObj.artists.length >= 1 ? eventObj.artists[0] : {
+						name : eventObj.title,
+						lastfm : "http://last.fm/event/" + eventObj.id,
+						genres : []
+					})
+					infoContentHTML = createInfoContentHtml(eventObj, artist, data, false);
+
+					info.setRolloverContent(createInfoContentHtml(eventObj, artist, data, true));
+					info.setInfoContentHTML(infoContentHTML);
+					infoContentHTML = "";
+					info.setDeclutterMode(true);
+					pinCollection.add(info);
+				});
+				map.addShapeCollection(pinCollection);
 			} else if (type === "venueSearch") {
 				var html = "";
-				// TODO display box
 				$.each(data, function(key, json) {
-					html += "<input type='checkbox' name='venue'/>" + json.name + (json.city !== "" ? " " + json.city : "") + (json.country !== "" ? " " + json.country : "") + "<br/>";
+					html += "<input type='checkbox' id='" + json.id + "' name='venue'/>" + json.name + (json.city !== "" ? " " + json.city : "") + (json.country !== "" ? " " + json.country : "") + "<br/>";
 				});
 				$("#error-panel").html(html).dialog({
 					modal : true,
@@ -339,7 +357,7 @@ function handleServerResponse(type) {
 						text : "Ok",
 						click : function() {
 							$(this).dialog("close");
-							sendRequest($('#error-panel input:checkbox:checked').val(), "venue", "", "", 25);
+							sendRequest($('#error-panel input:checkbox:checked').val(), "venue", "", "", 25, $('#error-panel input:checkbox:checked').attr('id')); // venue id
 						}
 					}, {
 						text : "Cancel",

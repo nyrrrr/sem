@@ -31,6 +31,7 @@ public class Application extends Controller {
 		String queryType = "";
 		Request req = null;
 		JsonNode result = null;
+		ArrayNode a = JsonNodeFactory.instance.arrayNode();
 		filledForm = requestForm.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return controllers.Application.displayMap();
@@ -46,7 +47,7 @@ public class Application extends Controller {
 			}
 		} else if (queryType.equals("location")) {
 			try {
-				ArrayNode a = JsonNodeFactory.instance.arrayNode();
+				a = JsonNodeFactory.instance.arrayNode();
 				// here we need to flip lat and lon... don't ask me why...
 				a.addAll(RequestController.getLocalEvents(req.lat, req.lon, Integer.parseInt(req.radius), false));
 				result = a;
@@ -54,7 +55,7 @@ public class Application extends Controller {
 				e.printStackTrace();
 			}
 		} else if (queryType.equals("venueSearch")) {
-			ArrayNode a = JsonNodeFactory.instance.arrayNode();
+			a = JsonNodeFactory.instance.arrayNode();
 			try {
 				result = a.addAll(RequestController.searchVenue(req.query, null));
 				if(result.size() <= 0) {
@@ -64,10 +65,17 @@ public class Application extends Controller {
 				e.printStackTrace();
 			}
 		} else if (queryType.equals("venue")) {
-			return TODO; // TODO
+			a = JsonNodeFactory.instance.arrayNode();
+			try {
+				result = RequestController.getVenueEvents(req.venue.toString(), false);
+				if(result == null || result.size() <= 0) result = Json.parse("{\"error\": 1312, \"message\" : \"No events could be found for that venue.\"}");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//return TODO; // TODO
 		} else {
 			result = Json.parse("{\"error\": 1337, \"message\" : \"It looks like no category was selected.\"}");
-			//result = Json.parse("{\"1\":1,\"2\" : {\"child\" : [1,2,3,4]} }");
 		}
 		return ok(result);
 	}

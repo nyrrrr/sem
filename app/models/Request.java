@@ -5,4 +5,5 @@ public class Request {
 	public String type;
 	public String lat, lon;
 	public String radius;
+	public String venue;
 }
