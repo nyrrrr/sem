@@ -7,6 +7,7 @@ import java.util.HashMap;
 import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import models.Artist;
@@ -60,12 +61,12 @@ public class RequestController {
 
 			// iterate through each event, create object and set variables
 			if (jsonGeoEvents != null && jsonGeoEvents.get("event") != null) {
-				if(jsonGeoEvents.get("event").getNodeType().name().equals("ARRAY")){
+				if (jsonGeoEvents.get("event").getNodeType().name().equals("ARRAY")) {
 					jsonGeoEvents = jsonGeoEvents.get("event");
 				}
-				
+
 				for (JsonNode event : jsonGeoEvents) {
-					if(event.get("id") != null && event.get("title") != null){
+					if (event.get("id") != null && event.get("title") != null) {
 						Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
 						e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
 
@@ -107,14 +108,15 @@ public class RequestController {
 								}
 							}
 
-							// convert event to JsonNode and store it in eventNodes
+							// convert event to JsonNode and store it in
+							// eventNodes
 							// list.
 							e.setVenue(v);
 							eventNodes.add(Json.toJson(e));
 						}
 
 					}
-					
+
 				}
 			}
 		}
@@ -173,9 +175,9 @@ public class RequestController {
 						a.addGenre(genre.get("name").toString().replaceAll("\"", ""));
 					}
 				}
-				
+
 				// get artist summary
-				if(jsonArtistInfo.get("bio") != null && jsonArtistInfo.get("bio").get("summary") != null){
+				if (jsonArtistInfo.get("bio") != null && jsonArtistInfo.get("bio").get("summary") != null) {
 					a.setDescription(jsonArtistInfo.get("bio").get("summary").toString().replaceAll("\"", ""));
 				}
 
@@ -193,12 +195,12 @@ public class RequestController {
 				if (jsonArtistEvents.get("events") != null && jsonArtistEvents.get("events").get("event") != null) {
 					JsonNode events = jsonArtistEvents.get("events");
 					HashMap<String, Event> eventList = new HashMap<String, Event>();
-					
-					if(events.get("event").getNodeType().name().equals("ARRAY")){
+
+					if (events.get("event").getNodeType().name().equals("ARRAY")) {
 						events = events.get("event");
 					}
 					for (JsonNode jEvent : events) {
-						if(jEvent.get("id") != null && jEvent.get("title") != null){
+						if (jEvent.get("id") != null && jEvent.get("title") != null) {
 							Event event = new Event(jEvent.get("id").toString().replaceAll("\"", ""), jEvent.get("title").toString().replaceAll("\"", ""));
 							event.setDate(jEvent.get("startDate").toString().replaceAll("\"", ""));
 							event.setTickets(jEvent.get("website").toString().replaceAll("\"", ""));
@@ -240,9 +242,8 @@ public class RequestController {
 								eventList.put(event.getId(), event);
 							}
 						}
-						
-					}
 
+					}
 
 					// Store the all events in artist's object.
 					a.setEvents(eventList);
@@ -259,34 +260,35 @@ public class RequestController {
 
 				// extract info from SPARQL response
 				RDFNode sameAs = sparql.sendMusicbrainzQuery(MusicbrainzSparqlFactory.ENDPOINT, query);
-				if(sameAs != null){
+				if (sameAs != null) {
 					query = dbpedia.getArtistInfoViaSameAs(sameAs.toString());
-//					query = dbpedia.getArtistInfo(a.getName());
+					// query = dbpedia.getArtistInfo(a.getName());
 				} else {
 					query = dbpedia.getArtistInfo(a.getName());
 				}
 				RDFNode[] nodes = sparql.sendDbpediaQuery(DBPediaSparqlFactory.ENDPOINT, query);
-				if(sameAs != null && nodes[0] == null && nodes[1] == null && nodes[2] == null && nodes[3] == null){
+				if (sameAs != null && nodes[0] == null && nodes[1] == null && nodes[2] == null && nodes[3] == null) {
 					query = dbpedia.getArtistInfo(a.getName());
 					nodes = sparql.sendDbpediaQuery(DBPediaSparqlFactory.ENDPOINT, query);
 				}
-				
-				if(nodes != null){
-					if(nodes[0] != null){
+
+				if (nodes != null) {
+					if (nodes[0] != null) {
 						a.setHomepage(nodes[0].toString());
 					}
-					if(nodes[1] != null){
-						String description = nodes[1].toString().replaceAll("@en", "");;
+					if (nodes[1] != null) {
+						String description = nodes[1].toString().replaceAll("@en", "");
+						;
 						a.setDescription(description);
 					}
-					if(nodes[2] != null){
+					if (nodes[2] != null) {
 						a.setCountry(nodes[2].toString());
 					}
-					if(nodes[3] != null){
+					if (nodes[3] != null) {
 						a.setWiki(nodes[3].toString());
 					}
 				}
-				
+
 				return Json.toJson(a);
 			}
 		}
@@ -316,41 +318,45 @@ public class RequestController {
 		// create parameter for Last.fm query to retrieve venues
 		String params = LastfmUri.getInstance().getVenueSearch(name, country);
 		JsonNode jsonVenues = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
-		jsonVenues = jsonVenues.get("results");
+		if (jsonVenues.get("error") != null) {
+			venueList.add(jsonVenues);
+			return venueList;
+		} else {
+			jsonVenues = jsonVenues.get("results");
+			// iterate through all matches and extract venue information
+			if (jsonVenues != null && jsonVenues.get("venuematches") != null) {
+				//jsonVenues = jsonVenues.get("venuematches");
+					
+				for (JsonNode venue : (jsonVenues.get("venuematches").get("venue") instanceof ArrayNode ? jsonVenues.get("venuematches").get("venue") : jsonVenues.get("venuematches"))) {
+					Venue v = new Venue(venue.get("id").toString().replaceAll("\"", ""), venue.get("name").toString().replaceAll("\"", ""));
+					v.setHomepage(venue.get("website").toString().replaceAll("\"", ""));
+					v.setPhone(venue.get("phonenumber").toString().replaceAll("\"", ""));
 
-		// iterate through all matches and extract venue information
-		if (jsonVenues != null && jsonVenues.get("venuematches") != null) {
-			jsonVenues = jsonVenues.get("venuematches");
-			for (JsonNode venue : jsonVenues.get("venue")) {
-				Venue v = new Venue(venue.get("id").toString().replaceAll("\"", ""), venue.get("name").toString().replaceAll("\"", ""));
-				v.setHomepage(venue.get("website").toString().replaceAll("\"", ""));
-				v.setPhone(venue.get("phonenumber").toString().replaceAll("\"", ""));
+					if (venue.get("location") != null) {
+						if (venue.get("location").get("geo:point") != null) {
+							v.setLatitude(venue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
+							v.setLongitude(venue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+						}
+						v.setCity(venue.get("location").get("city").toString().replaceAll("\"", ""));
+						v.setCountry(venue.get("location").get("country").toString().replaceAll("\"", ""));
+						v.setStreet(venue.get("location").get("street").toString().replaceAll("\"", ""));
+						v.setPostalCode(venue.get("location").get("postalcode").toString().replaceAll("\"", ""));
 
-				if (venue.get("location") != null) {
-					if (venue.get("location").get("geo:point") != null) {
-						v.setLatitude(venue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
-						v.setLongitude(venue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
 					}
-					v.setCity(venue.get("location").get("city").toString().replaceAll("\"", ""));
-					v.setCountry(venue.get("location").get("country").toString().replaceAll("\"", ""));
-					v.setStreet(venue.get("location").get("street").toString().replaceAll("\"", ""));
-					v.setPostalCode(venue.get("location").get("postalcode").toString().replaceAll("\"", ""));
 
-				}
-
-				if (venue.get("image") != null) {
-					for (JsonNode image : venue.get("image")) {
-						if (image.get("size").toString().replaceAll("\"", "").equals("large")) {
-							v.setImg(image.get("#text").toString().replaceAll("\"", ""));
+					if (venue.get("image") != null) {
+						for (JsonNode image : venue.get("image")) {
+							if (image.get("size").toString().replaceAll("\"", "").equals("large")) {
+								v.setImg(image.get("#text").toString().replaceAll("\"", ""));
+							}
 						}
 					}
-				}
 
-				// convert Venue to JsonNode and store it in the list.
-				venueList.add(Json.toJson(v));
+					// convert Venue to JsonNode and store it in the list.
+					venueList.add(Json.toJson(v));
+				}
 			}
 		}
-
 		return venueList;
 	}
 
@@ -374,14 +380,14 @@ public class RequestController {
 		String params = LastfmUri.getInstance().getVenueEvents(id, festivalsOnly);
 		JsonNode jsonVenueEvents = request.sendRequest("GET", LastfmUri.ENDPOINT, params);
 		jsonVenueEvents = jsonVenueEvents.get("events");
-		
+
 		// iterate through each event, create object, set variables and add
 		// it to venue object
 		Venue venue = null;
 		boolean isFirst = true;
 		if (jsonVenueEvents != null && jsonVenueEvents.get("event") != null) {
 			for (JsonNode event : jsonVenueEvents.get("event")) {
-				if(event.get("id") != null && event.get("title") != null){
+				if (event.get("id") != null && event.get("title") != null) {
 					// extract event information, store it in Event instance and
 					// add it to the Venue instance
 					Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
@@ -402,7 +408,6 @@ public class RequestController {
 						}
 					}
 
-					
 					// for the first element in the list, extract venue
 					// information (stored in all events, but only needed once)
 					if (isFirst) {
@@ -443,7 +448,6 @@ public class RequestController {
 					}
 				}
 
-
 			}
 		}
 
@@ -457,20 +461,24 @@ public class RequestController {
 
 	public static void main(String[] args) throws IOException {
 
-//		System.out.println(getLocalEvents(null, null, 20, false));
-//		System.out.println(getLocalEvents("49.29180", "8.264116", 20, false));
-//		System.out.println(getLocalEvents("49.4058478", "8.7150993861622", 5, false));
-//		System.out.println(getVenueEvents("8908030", false));
-//		System.out.println(getVenueEvents("8908030", true));
-//		System.out.println(getArtistEvents("Enter Shikari", false).toString());
+		// System.out.println(getLocalEvents(null, null, 20, false));
+		// System.out.println(getLocalEvents("49.29180", "8.264116", 20,
+		// false));
+		// System.out.println(getLocalEvents("49.4058478", "8.7150993861622", 5,
+		// false));
+		// System.out.println(getVenueEvents("8908030", false));
+		// System.out.println(getVenueEvents("8908030", true));
+		// System.out.println(getArtistEvents("Enter Shikari",
+		// false).toString());
 		System.out.println(getArtistEvents("Volbeat", false).toString());
-//		System.out.println(getArtistEvents("Söhne Mannheims", false).toString());
-//		System.out.println(getArtistEvents("Max Herre", false).toString()); // NullPointerException for whatever reason
-//		System.out.println(getArtistEvents("Alesana", false).toString()); // NullPointerException for whatever reason
-//		System.out.println(searchVenue("SAP Arena", "Germany").toString());
+		// System.out.println(getArtistEvents("Söhne Mannheims",
+		// false).toString());
+		// System.out.println(getArtistEvents("Max Herre", false).toString());
+		// // NullPointerException for whatever reason
+		// System.out.println(getArtistEvents("Alesana", false).toString()); //
+		// NullPointerException for whatever reason
+		// System.out.println(searchVenue("SAP Arena", "Germany").toString());
 
-		
-		
 	}
 
 }
