@@ -8,6 +8,7 @@ import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import models.Artist;
@@ -321,12 +322,15 @@ public class RequestController {
 		if (jsonVenues.get("error") != null) {
 			venueList.add(jsonVenues);
 			return venueList;
-		} else {
+		} else if (jsonVenues == null 
+				|| jsonVenues.get("results") == null || jsonVenues.get("results").get("venuematches").toString() == " ") {
+			return venueList;
+		}else {
 			jsonVenues = jsonVenues.get("results");
 			// iterate through all matches and extract venue information
 			if (jsonVenues != null && jsonVenues.get("venuematches") != null) {
-				//jsonVenues = jsonVenues.get("venuematches");
-					
+				// jsonVenues = jsonVenues.get("venuematches");
+
 				for (JsonNode venue : (jsonVenues.get("venuematches").get("venue") instanceof ArrayNode ? jsonVenues.get("venuematches").get("venue") : jsonVenues.get("venuematches"))) {
 					Venue v = new Venue(venue.get("id").toString().replaceAll("\"", ""), venue.get("name").toString().replaceAll("\"", ""));
 					v.setHomepage(venue.get("website").toString().replaceAll("\"", ""));

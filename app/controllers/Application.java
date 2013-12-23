@@ -57,13 +57,17 @@ public class Application extends Controller {
 			ArrayNode a = JsonNodeFactory.instance.arrayNode();
 			try {
 				result = a.addAll(RequestController.searchVenue(req.query, null));
+				if(result.size() <= 0) {
+					result = Json.parse("{\"error\": 1234, \"message\" : \"No venues could be found using that string.\"}");
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else if (queryType.equals("venue")) {
 			return TODO; // TODO
 		} else {
-			result = Json.parse("{error: 1337, message : 'It looks like no category was selected.'}");
+			result = Json.parse("{\"error\": 1337, \"message\" : \"It looks like no category was selected.\"}");
+			//result = Json.parse("{\"1\":1,\"2\" : {\"child\" : [1,2,3,4]} }");
 		}
 		return ok(result);
 	}
