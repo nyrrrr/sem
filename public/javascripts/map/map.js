@@ -43,7 +43,7 @@ function init() {
 					lat : 49.48703,
 					lng : 8.46625
 				}, /*center of map in latitude/longitude */
-				mtype : 'osm', /*map type (osm)*/
+				mtype : 'map', // map type (map, sat, hyb); defaults to map
 				bestFitMargin : 100, /*margin offset from the map viewport when applying a bestfit on shapes*/
 				zoomOnDoubleClick : true	/*zoom in when double-clicking on map*/
 			};
