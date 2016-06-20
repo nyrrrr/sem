@@ -48,7 +48,8 @@ public class RequestController {
 	 * @return eventNodes - A list of all events stored as JsonNode objects.
 	 * @throws IOException
 	 */
-	public static ArrayList<JsonNode> getLocalEvents(String latitude, String longitude, int radius, boolean festivalsOnly) throws IOException {
+	public static ArrayList<JsonNode> getLocalEvents(String latitude, String longitude, int radius,
+			boolean festivalsOnly) throws IOException {
 		ArrayList<JsonNode> eventNodes = new ArrayList<JsonNode>();
 
 		// create parameter for Last.fm query to retrieve local event info
@@ -68,7 +69,8 @@ public class RequestController {
 
 				for (JsonNode event : jsonGeoEvents) {
 					if (event.get("id") != null && event.get("title") != null) {
-						Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
+						Event e = new Event(event.get("id").toString().replaceAll("\"", ""),
+								event.get("title").toString().replaceAll("\"", ""));
 						e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
 
 						if (event.get("artists") != null) {
@@ -86,19 +88,23 @@ public class RequestController {
 
 						JsonNode jsonVenue = event.get("venue");
 						if (jsonVenue != null) {
-							Venue v = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
+							Venue v = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""),
+									jsonVenue.get("name").toString().replaceAll("\"", ""));
 							v.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
 							v.setPhone(jsonVenue.get("phonenumber").toString().replaceAll("\"", ""));
 
 							if (jsonVenue.get("location") != null) {
 								if (jsonVenue.get("location").get("geo:point") != null) {
-									v.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
-									v.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+									v.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat").toString()
+											.replaceAll("\"", ""));
+									v.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long").toString()
+											.replaceAll("\"", ""));
 								}
 								v.setCity(jsonVenue.get("location").get("city").toString().replaceAll("\"", ""));
 								v.setCountry(jsonVenue.get("location").get("country").toString().replaceAll("\"", ""));
 								v.setStreet(jsonVenue.get("location").get("street").toString().replaceAll("\"", ""));
-								v.setPostalCode(jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
+								v.setPostalCode(
+										jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
 							}
 
 							if (event.get("image") != null) {
@@ -202,7 +208,8 @@ public class RequestController {
 					}
 					for (JsonNode jEvent : events) {
 						if (jEvent.get("id") != null && jEvent.get("title") != null) {
-							Event event = new Event(jEvent.get("id").toString().replaceAll("\"", ""), jEvent.get("title").toString().replaceAll("\"", ""));
+							Event event = new Event(jEvent.get("id").toString().replaceAll("\"", ""),
+									jEvent.get("title").toString().replaceAll("\"", ""));
 							event.setDate(jEvent.get("startDate").toString().replaceAll("\"", ""));
 							event.setTickets(jEvent.get("website").toString().replaceAll("\"", ""));
 
@@ -215,19 +222,25 @@ public class RequestController {
 							// extract venue information and set its variables
 							JsonNode jVenue = jEvent.get("venue");
 							if (jVenue != null) {
-								Venue venue = new Venue(jVenue.get("id").toString().replaceAll("\"", ""), jVenue.get("name").toString().replaceAll("\"", ""));
+								Venue venue = new Venue(jVenue.get("id").toString().replaceAll("\"", ""),
+										jVenue.get("name").toString().replaceAll("\"", ""));
 								venue.setHomepage(jVenue.get("website").toString().replaceAll("\"", ""));
 								venue.setPhone(jVenue.get("phonenumber").toString().replaceAll("\"", ""));
 
 								if (jVenue.get("location") != null) {
 									if (jVenue.get("location").get("geo:point") != null) {
-										venue.setLatitude(jVenue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
-										venue.setLongitude(jVenue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+										venue.setLatitude(jVenue.get("location").get("geo:point").get("geo:lat")
+												.toString().replaceAll("\"", ""));
+										venue.setLongitude(jVenue.get("location").get("geo:point").get("geo:long")
+												.toString().replaceAll("\"", ""));
 									}
 									venue.setCity(jVenue.get("location").get("city").toString().replaceAll("\"", ""));
-									venue.setCountry(jVenue.get("location").get("country").toString().replaceAll("\"", ""));
-									venue.setStreet(jVenue.get("location").get("street").toString().replaceAll("\"", ""));
-									venue.setPostalCode(jVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
+									venue.setCountry(
+											jVenue.get("location").get("country").toString().replaceAll("\"", ""));
+									venue.setStreet(
+											jVenue.get("location").get("street").toString().replaceAll("\"", ""));
+									venue.setPostalCode(
+											jVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
 								}
 
 								if (jVenue.get("image") != null) {
@@ -322,24 +335,28 @@ public class RequestController {
 		if (jsonVenues.get("error") != null) {
 			venueList.add(jsonVenues);
 			return venueList;
-		} else if (jsonVenues == null 
-				|| jsonVenues.get("results") == null || jsonVenues.get("results").get("venuematches").toString() == " ") {
+		} else if (jsonVenues == null || jsonVenues.get("results") == null
+				|| jsonVenues.get("results").get("venuematches").toString() == " ") {
 			return venueList;
-		}else {
+		} else {
 			jsonVenues = jsonVenues.get("results");
 			// iterate through all matches and extract venue information
 			if (jsonVenues != null && jsonVenues.get("venuematches") != null) {
 				// jsonVenues = jsonVenues.get("venuematches");
 
-				for (JsonNode venue : (jsonVenues.get("venuematches").get("venue") instanceof ArrayNode ? jsonVenues.get("venuematches").get("venue") : jsonVenues.get("venuematches"))) {
-					Venue v = new Venue(venue.get("id").toString().replaceAll("\"", ""), venue.get("name").toString().replaceAll("\"", ""));
+				for (JsonNode venue : (jsonVenues.get("venuematches").get("venue") instanceof ArrayNode
+						? jsonVenues.get("venuematches").get("venue") : jsonVenues.get("venuematches"))) {
+					Venue v = new Venue(venue.get("id").toString().replaceAll("\"", ""),
+							venue.get("name").toString().replaceAll("\"", ""));
 					v.setHomepage(venue.get("website").toString().replaceAll("\"", ""));
 					v.setPhone(venue.get("phonenumber").toString().replaceAll("\"", ""));
 
 					if (venue.get("location") != null) {
 						if (venue.get("location").get("geo:point") != null) {
-							v.setLatitude(venue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
-							v.setLongitude(venue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+							v.setLatitude(venue.get("location").get("geo:point").get("geo:lat").toString()
+									.replaceAll("\"", ""));
+							v.setLongitude(venue.get("location").get("geo:point").get("geo:long").toString()
+									.replaceAll("\"", ""));
 						}
 						v.setCity(venue.get("location").get("city").toString().replaceAll("\"", ""));
 						v.setCountry(venue.get("location").get("country").toString().replaceAll("\"", ""));
@@ -394,7 +411,8 @@ public class RequestController {
 				if (event.get("id") != null && event.get("title") != null) {
 					// extract event information, store it in Event instance and
 					// add it to the Venue instance
-					Event e = new Event(event.get("id").toString().replaceAll("\"", ""), event.get("title").toString().replaceAll("\"", ""));
+					Event e = new Event(event.get("id").toString().replaceAll("\"", ""),
+							event.get("title").toString().replaceAll("\"", ""));
 					e.setDate(event.get("startDate").toString().replaceAll("\"", ""));
 					e.setTickets(event.get("website").toString().replaceAll("\"", ""));
 					ArrayList<Artist> artists = new ArrayList<Artist>();
@@ -422,19 +440,25 @@ public class RequestController {
 						// instance
 						JsonNode jsonVenue = event.get("venue");
 						if (jsonVenue != null) {
-							venue = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""), jsonVenue.get("name").toString().replaceAll("\"", ""));
+							venue = new Venue(jsonVenue.get("id").toString().replaceAll("\"", ""),
+									jsonVenue.get("name").toString().replaceAll("\"", ""));
 							venue.setHomepage(jsonVenue.get("website").toString().replaceAll("\"", ""));
 							venue.setPhone(jsonVenue.get("phonenumber").toString().replaceAll("\"", ""));
 
 							if (jsonVenue.get("location") != null) {
 								if (jsonVenue.get("location").get("geo:point") != null) {
-									venue.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat").toString().replaceAll("\"", ""));
-									venue.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long").toString().replaceAll("\"", ""));
+									venue.setLatitude(jsonVenue.get("location").get("geo:point").get("geo:lat")
+											.toString().replaceAll("\"", ""));
+									venue.setLongitude(jsonVenue.get("location").get("geo:point").get("geo:long")
+											.toString().replaceAll("\"", ""));
 								}
 								venue.setCity(jsonVenue.get("location").get("city").toString().replaceAll("\"", ""));
-								venue.setCountry(jsonVenue.get("location").get("country").toString().replaceAll("\"", ""));
-								venue.setStreet(jsonVenue.get("location").get("street").toString().replaceAll("\"", ""));
-								venue.setPostalCode(jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
+								venue.setCountry(
+										jsonVenue.get("location").get("country").toString().replaceAll("\"", ""));
+								venue.setStreet(
+										jsonVenue.get("location").get("street").toString().replaceAll("\"", ""));
+								venue.setPostalCode(
+										jsonVenue.get("location").get("postalcode").toString().replaceAll("\"", ""));
 							}
 
 							// retrieve venue picture link with size 'large'

@@ -3,11 +3,11 @@ package models;
 public class MusicbrainzSparqlFactory {
 
 	public static final String ENDPOINT = "http://dbtune.org/musicbrainz/sparql";
-	
+
 	private static MusicbrainzSparqlFactory instance = null;
 	private final String PREFIXES;
-	
-	private MusicbrainzSparqlFactory(){
+
+	private MusicbrainzSparqlFactory() {
 		StringBuilder builder = new StringBuilder(100);
 		builder.append("PREFIX map: <file:/home/moustaki/work/motools/musicbrainz/d2r-server-0.4/mbz_mapping_raw.n3#>");
 		builder.append("\r\n");
@@ -45,36 +45,27 @@ public class MusicbrainzSparqlFactory {
 		builder.append("\r\n");
 		builder.append("PREFIX artist: <http://musicbrainz.org/artist/>");
 		builder.append("\r\n");
-		
+
 		PREFIXES = builder.toString();
-		
+
 	}
-	
-	public static MusicbrainzSparqlFactory getInstance(){
-		if(instance == null){
+
+	public static MusicbrainzSparqlFactory getInstance() {
+		if (instance == null) {
 			instance = new MusicbrainzSparqlFactory();
 		}
 		return instance;
 	}
-	
-	public String getArtistDbpedia(String artist){
-		return PREFIXES + 
-				"SELECT * WHERE {" + 
-			    " ?artist foaf:name \"" + artist + "\"." +
-				" ?artist owl:sameAs ?same." +
-			    " FILTER(REGEX(STR(?same), \"dbpedia.org/resource/\"))" + 
-			    "}" +
-			    "LIMIT 1";
+
+	public String getArtistDbpedia(String artist) {
+		return PREFIXES + "SELECT * WHERE {" + " ?artist foaf:name \"" + artist + "\"." + " ?artist owl:sameAs ?same."
+				+ " FILTER(REGEX(STR(?same), \"dbpedia.org/resource/\"))" + "}" + "LIMIT 1";
 	}
-	
-	public String getArtistDbpediaViaMbid(String mbid){
-		return PREFIXES +
-				"SELECT * WHERE {" + 
-				" ?artist mo:musicbrainz artist:" + mbid + "." + 
-				" ?artist owl:sameAs ?same." +
-			    " FILTER(REGEX(STR(?same), \"dbpedia.org/resource/\"))" +
-				"}" + 
-			    "LIMIT 1";
+
+	public String getArtistDbpediaViaMbid(String mbid) {
+		return PREFIXES + "SELECT * WHERE {" + " ?artist mo:musicbrainz artist:" + mbid + "."
+				+ " ?artist owl:sameAs ?same." + " FILTER(REGEX(STR(?same), \"dbpedia.org/resource/\"))" + "}"
+				+ "LIMIT 1";
 	}
-	
+
 } // End of Class

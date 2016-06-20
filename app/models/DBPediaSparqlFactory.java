@@ -3,11 +3,11 @@ package models;
 public class DBPediaSparqlFactory {
 
 	public static final String ENDPOINT = "http://dbpedia.org/sparql/";
-	
+
 	private static DBPediaSparqlFactory instance = null;
 	private final String PREFIXES;
-	
-	private DBPediaSparqlFactory(){
+
+	private DBPediaSparqlFactory() {
 		StringBuilder builder = new StringBuilder(100);
 		builder.append("PREFIX owl: <http://www.w3.org/2002/07/owl#>");
 		builder.append("\r\n");
@@ -33,69 +33,37 @@ public class DBPediaSparqlFactory {
 		builder.append("\r\n");
 		builder.append("PREFIX schema: <http://schema.org/>");
 		builder.append("\r\n");
-		
+
 		PREFIXES = builder.toString();
-		
+
 	}
-	
-	public static DBPediaSparqlFactory getInstance(){
-		if(instance == null){
+
+	public static DBPediaSparqlFactory getInstance() {
+		if (instance == null) {
 			instance = new DBPediaSparqlFactory();
 		}
 		return instance;
 	}
-	
-	public String getArtistInfo(String artist){
-		return PREFIXES + 
-				"SELECT * WHERE {" + 
-			    " ?artist a schema:MusicGroup." + 
-			    " ?artist dbpedia2:name \"" + artist + "\"@en." +
-				" OPTIONAL {" +
-				"  ?artist foaf:homepage ?homepage." +
-				" }" +
-				" OPTIONAL {" +
-				"  ?artist dbo:abstract ?abstract." +
-				"  FILTER(lang(?abstract) = \"en\")." +
-				" }" +
-				" OPTIONAL {" +
-				"  ?artist dbo:hometown ?home." + 
-				"  ?home a schema:Country." +
-				" }" +
-				" OPTIONAL {" +
-				"  ?artist foaf:isPrimaryTopicOf ?wiki." +
-				" }" +
-			    "}" +
-				"LIMIT 1";
+
+	public String getArtistInfo(String artist) {
+		return PREFIXES + "SELECT * WHERE {" + " ?artist a schema:MusicGroup." + " ?artist dbpedia2:name \"" + artist
+				+ "\"@en." + " OPTIONAL {" + "  ?artist foaf:homepage ?homepage." + " }" + " OPTIONAL {"
+				+ "  ?artist dbo:abstract ?abstract." + "  FILTER(lang(?abstract) = \"en\")." + " }" + " OPTIONAL {"
+				+ "  ?artist dbo:hometown ?home." + "  ?home a schema:Country." + " }" + " OPTIONAL {"
+				+ "  ?artist foaf:isPrimaryTopicOf ?wiki." + " }" + "}" + "LIMIT 1";
 	}
-	
-	public String getArtistInfoViaSameAs(String sameAs){
+
+	public String getArtistInfoViaSameAs(String sameAs) {
 		sameAs = "<" + sameAs + ">";
-		return PREFIXES + 
-				"SELECT * WHERE {" + 
-				sameAs + " a schema:MusicGroup." +
-				" OPTIONAL {" +
-				  sameAs + " foaf:homepage ?homepage." +
-				" }" +
-				" OPTIONAL {" +
-				   sameAs + " dbo:abstract ?abstract." +
-				"  FILTER(lang(?abstract) = \"en\")." +
-				" }" +
-				" OPTIONAL {" +
-				   sameAs + " dbo:hometown ?home." +
-				"  ?home a schema:Country." +
-				" }" +
-				" OPTIONAL {" +
-				   sameAs + " foaf:isPrimaryTopicOf ?wiki." +
-				" }" +
-				"}" +
-				"LIMIT 1";
+		return PREFIXES + "SELECT * WHERE {" + sameAs + " a schema:MusicGroup." + " OPTIONAL {" + sameAs
+				+ " foaf:homepage ?homepage." + " }" + " OPTIONAL {" + sameAs + " dbo:abstract ?abstract."
+				+ "  FILTER(lang(?abstract) = \"en\")." + " }" + " OPTIONAL {" + sameAs + " dbo:hometown ?home."
+				+ "  ?home a schema:Country." + " }" + " OPTIONAL {" + sameAs + " foaf:isPrimaryTopicOf ?wiki." + " }"
+				+ "}" + "LIMIT 1";
 	}
-	
-	public String getVenueInfo(String venue){
-		return PREFIXES +
-				"SELECT * WHERE {" +
-				" ?venue a" +
-				"}";
+
+	public String getVenueInfo(String venue) {
+		return PREFIXES + "SELECT * WHERE {" + " ?venue a" + "}";
 	}
-	
+
 } // End of Class

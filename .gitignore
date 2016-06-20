@@ -17,3 +17,4 @@ app/*.class
 app/controllers/*.class
 app/models/*.class
 /bin
+*/priv_*

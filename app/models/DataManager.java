@@ -14,5 +14,5 @@ public class DataManager {
 		}
 		return instance;
 	}
-	
+
 } // End of Class

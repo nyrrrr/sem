@@ -13,53 +13,52 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class HttpRequestManager {
 
-
 	public final String USER_AGENT = "Semantic Event Map / 1.0 (Development Phase)";
-	
+
 	private static HttpRequestManager instance = null;
-	
-	private HttpRequestManager(){
-		
+
+	private HttpRequestManager() {
+
 	}
-	
-	public static HttpRequestManager getInstance(){
-		if(instance == null){
+
+	public static HttpRequestManager getInstance() {
+		if (instance == null) {
 			instance = new HttpRequestManager();
 		}
 		return instance;
 	}
-	
-	public JsonNode sendRequest(String requestMethod, String endpoint, String params) throws IOException{
-		
+
+	public JsonNode sendRequest(String requestMethod, String endpoint, String params) throws IOException {
+
 		URL url = new URL(endpoint + params);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		
+
 		connection.setRequestMethod(requestMethod);
 		connection.setRequestProperty("User-Agent", USER_AGENT);
-		
+
 		connection.setDoOutput(true);
 		DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
 		dos.writeBytes(params);
 		dos.flush();
 		dos.close();
-		
+
 		int responseCode = connection.getResponseCode();
 		System.out.println("Sending '" + requestMethod + "' request to URL: " + url.toString());
 		System.out.println("URL: " + endpoint);
 		System.out.println("Params: " + params);
 		System.out.println("Response Code: " + responseCode + " " + connection.getResponseMessage() + "\r\n\r\n");
-		
+
 		BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		StringBuilder stringResponse = new StringBuilder();
 		String line = "";
-		while((line = rd.readLine()) != null){
-//			System.out.println(line);
+		while ((line = rd.readLine()) != null) {
+			// System.out.println(line);
 			stringResponse.append(line);
 		}
 		rd.close();
-		
+
 		return Json.parse(stringResponse.toString());
-		
+
 	}
-	
+
 } // End of Class

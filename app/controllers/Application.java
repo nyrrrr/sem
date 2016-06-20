@@ -1,4 +1,5 @@
 package controllers;
+
 import java.io.IOException;
 import models.Request;
 import play.data.Form;
@@ -9,14 +10,17 @@ import views.html.map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 public class Application extends Controller {
 	// framerwork vars
 	static Form<Request> requestForm = Form.form(Request.class);
 	static Form<Request> filledForm;
+
 	// deprecated but still in routes..
 	public static Result index() {
 		return controllers.Application.displayMap();
 	}
+
 	// default map rendering
 	public static Result displayMap() {
 		if (filledForm != null) {
@@ -26,6 +30,7 @@ public class Application extends Controller {
 		}
 		return ok(map.render("Map", requestForm));
 	}
+
 	// handle input on map page
 	public static Result processQuery() {
 		String queryType = "";
@@ -58,8 +63,9 @@ public class Application extends Controller {
 			a = JsonNodeFactory.instance.arrayNode();
 			try {
 				result = a.addAll(RequestController.searchVenue(req.query, null));
-				if(result.size() <= 0) {
-					result = Json.parse("{\"error\": 1234, \"message\" : \"No venues could be found using that string.\"}");
+				if (result.size() <= 0) {
+					result = Json
+							.parse("{\"error\": 1234, \"message\" : \"No venues could be found using that string.\"}");
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -68,12 +74,14 @@ public class Application extends Controller {
 			a = JsonNodeFactory.instance.arrayNode();
 			try {
 				result = RequestController.getVenueEvents(req.venue.toString(), false);
-				if(result == null || result.size() <= 0) result = Json.parse("{\"error\": 1312, \"message\" : \"No events could be found for that venue.\"}");
+				if (result == null || result.size() <= 0)
+					result = Json
+							.parse("{\"error\": 1312, \"message\" : \"No events could be found for that venue.\"}");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			//return TODO; // TODO
+			// return TODO; // TODO
 		} else {
 			result = Json.parse("{\"error\": 1337, \"message\" : \"It looks like no category was selected.\"}");
 		}

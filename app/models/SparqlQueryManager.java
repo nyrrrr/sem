@@ -12,66 +12,64 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 public class SparqlQueryManager {
 
 	private static SparqlQueryManager instance = null;
-	
-	private SparqlQueryManager(){
+
+	private SparqlQueryManager() {
 
 	}
-	
-	public static SparqlQueryManager getInstance(){
-		if(instance == null){
+
+	public static SparqlQueryManager getInstance() {
+		if (instance == null) {
 			instance = new SparqlQueryManager();
 		}
 		return instance;
 	}
-	
-	public RDFNode sendMusicbrainzQuery(String endpoint, String queryString){
+
+	public RDFNode sendMusicbrainzQuery(String endpoint, String queryString) {
 
 		Query query = QueryFactory.create(queryString);
 		ARQ.getContext().setTrue(ARQ.useSAX);
 		QueryExecution execution = QueryExecutionFactory.sparqlService(endpoint, query);
 		RDFNode sameAs = null;
-		
-		try{
+
+		try {
 			ResultSet results = execution.execSelect();
-			while(results.hasNext()){
+			while (results.hasNext()) {
 				QuerySolution solution = results.nextSolution();
 				sameAs = solution.get("?same");
 				System.out.println(sameAs);
 			}
-		}
-		finally{
+		} finally {
 			execution.close();
 		}
-		
+
 		return sameAs;
 	}
-	
-	public RDFNode[] sendDbpediaQuery(String endpoint, String queryString){
+
+	public RDFNode[] sendDbpediaQuery(String endpoint, String queryString) {
 		Query query = QueryFactory.create(queryString);
 		ARQ.getContext().setTrue(ARQ.useSAX);
 		QueryExecution execution = QueryExecutionFactory.sparqlService(endpoint, query);
-		
+
 		RDFNode homepage = null;
 		RDFNode description = null;
 		RDFNode hometown = null;
 		RDFNode wiki = null;
-		
-		try{
+
+		try {
 			ResultSet results = execution.execSelect();
-			while(results.hasNext()){
+			while (results.hasNext()) {
 				QuerySolution solution = results.nextSolution();
 				homepage = solution.get("?homepage");
 				description = solution.get("?abstract");
 				hometown = solution.get("?home");
 				wiki = solution.get("?wiki");
 			}
-		}
-		finally{
+		} finally {
 			execution.close();
 		}
-		
-		RDFNode[] nodes = {homepage, description, hometown, wiki};		
+
+		RDFNode[] nodes = { homepage, description, hometown, wiki };
 		return nodes;
 	}
-	
+
 } // End of Class

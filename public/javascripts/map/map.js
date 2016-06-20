@@ -58,10 +58,13 @@ function init() {
 				var gcontrol = new MQA.GeolocationControl();
 				gcontrol.onLocate = function(poi, position) {
 					sendRequest("", "location", position.coords.latitude, position.coords.longitude, $('#radius :selected').val());
-					var point = new MQA.Poi( {lat: position.coords.latitude, lng: position.coords.longitude} );
+					var point = new MQA.Poi({
+						lat : position.coords.latitude,
+						lng : position.coords.longitude
+					});
 					var icon = new MQA.Icon("http://content.mqcdn.com/open-sdk/js/v7.0.1/images/waving_man_sm.png", 20, 29);
 					point.setIcon(icon);
-					map.addShape(point);			
+					map.addShape(point);
 				};
 				map.addControl(gcontrol, new MQA.MapCornerPlacement(MQA.MapCorner.TOP_RIGHT, new MQA.Size(10, 50)));
 				// Map Control options
