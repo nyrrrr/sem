@@ -1,4 +1,5 @@
-This is your new Play application
-=====================================
+# Semantic Event Map
 
-This file will be packaged with your application, when using `play dist`.
+created for and during a two-man group project for a univeristy course on semantic web.
+
+Needs some refactoring, now due to API changes.
